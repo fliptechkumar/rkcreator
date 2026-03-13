@@ -168,60 +168,7 @@ export default function PayDueScreen({ navigation }: Props) {
     return raw;
   };
 
-  const fetchShowMore = async (item: PayDueItem) => {
-    const cardKey = getCardKey(item);
-   // setShowMoreLoading((prev) => ({ ...prev, [cardKey]: true }));
-    console.log('Fetching show more for card:', item);
-
-    try {
-      const response = await fetch(
-        `${API_ENDPOINTS.PAY_DUE_SHOWMORE}?customer_id=${item.customer_id}&customer_scheme_id=${item.customer_scheme_id}`,
-        {
-          method: 'GET',
-          headers: {
-            'Accept': 'application/json',
-            'Internal': 'Nezlan',
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-        }
-      );
-
-      const responseData = await response.json();
-      console.log('Pay Due Show More Response:', responseData);
-      if (responseData && responseData.success && Array.isArray(responseData.data)) {
-        setShowMoreData((prev) => ({ ...prev, [cardKey]: responseData.data }));
-        setShowMoreFetched((prev) => ({ ...prev, [cardKey]: true }));
-      } else {
-        setShowMoreData((prev) => ({ ...prev, [cardKey]: [] }));
-        setShowMoreFetched((prev) => ({ ...prev, [cardKey]: true }));
-      }
-    } catch (error: any) {
-      console.error('Error fetching pay due show more:', error.message);
-      setShowMoreData((prev) => ({ ...prev, [cardKey]: [] }));
-      setShowMoreFetched((prev) => ({ ...prev, [cardKey]: false }));
-      alert(`Error: ${error.message || 'Failed to fetch pay due list'}`);
-    } finally {
-      setShowMoreLoading((prev) => ({ ...prev, [cardKey]: false }));
-    }
-  };
-
-  const handleShowMore = async (item: PayDueItem) => {
-    const cardKey = getCardKey(item);
-    const isExpanded = !!expandedCards[cardKey];
-
-    if (isExpanded) {
-      setExpandedCards((prev) => ({ ...prev, [cardKey]: false }));
-      return;
-    }
-
-    setExpandedCards((prev) => ({ ...prev, [cardKey]: true }));
-
-    if (!showMoreFetched[cardKey]) {
-      await fetchShowMore(item);
-    }
-  };
-
+ 
     const handlePayNow = async (dueItem: PayDueItem) => {
       console.log('Initiating payment for due item:', dueItem);
     if (!dueItem || payNowLoading) {
@@ -361,16 +308,16 @@ export default function PayDueScreen({ navigation }: Props) {
   const verifyPayment = async (data: any, dueItem: PayDueItem) => {
     // console.log('Verifying payment with data:', data);
     // console.log('order_id:', data.razorpay_order_id);
-    console.log({
-          razorpay_payment_id: data.razorpay_payment_id,
-          razorpay_order_id: data.razorpay_order_id,
-          razorpay_signature: data.razorpay_signature,
-          amount: dueItem?.payed_amount,
-          customer_id: dueItem?.customer_id,
-          scheme_group_id: null,
-          chit_payment_id: dueItem?.p_id,
-          type: "installment",
-        });
+    // console.log({
+    //       razorpay_payment_id: data.razorpay_payment_id,
+    //       razorpay_order_id: data.razorpay_order_id,
+    //       razorpay_signature: data.razorpay_signature,
+    //       amount: dueItem?.payed_amount,
+    //       customer_id: dueItem?.customer_id,
+    //       scheme_group_id: null,
+    //       chit_payment_id: dueItem?.p_id,
+    //       type: "installment",
+    //     });
     try {
       console.log("url:", API_ENDPOINTS.VERIFY_PAYMENT);
        
@@ -489,7 +436,7 @@ export default function PayDueScreen({ navigation }: Props) {
                     <View style={styles.detailsSection}>
                       <View style={styles.detailRow}>
                         <View style={styles.detailItem}>
-                          <Text style={styles.detailLabel}>Gold Weight</Text>
+                          <Text style={styles.detailLabel}>Acc. weight</Text>
                           <Text style={styles.detailValue}>{Number(item.total_gold_weight).toFixed(3)}g</Text>
                         </View>
                         <View style={styles.detailItem}>
@@ -507,13 +454,11 @@ export default function PayDueScreen({ navigation }: Props) {
                       </View>
 
                       {item.due_group.map((dueItem, index) => {
+                        console.log('Processing due item:', dueItem);
                         const dueAmount = getDueAmount(dueItem);
-                        const dueLabel =
-                          dueItem?.due_group_name ||
-                          dueItem?.duration_type ||
-                          `Group ${index + 1}`;
+                        const dueLabel =dueItem?.pay_installment+"/"+dueItem?.total_installments ;
                         const dueText = dueItem?.due_group_name || 'Due';
-                        const monthText = dueItem?.paying_month;
+                        const monthText = formatMonthToMmYy(dueItem?.paying_month)  ;
 
                         return (
                           <View key={`${cardKey}-due-${index}`} style={styles.dueGroupCard}>
@@ -522,14 +467,14 @@ export default function PayDueScreen({ navigation }: Props) {
                               <Text style={styles.dueGroupTag}>Due</Text>
                             </View> */}
                             <View style={styles.dueTableHeaderRow}>
-                              <Text style={[styles.dueTableHeaderText, styles.dueColAmount]}>Amount</Text>
-                              <Text style={[styles.dueTableHeaderText, styles.dueColDue]}>Due</Text>
-                              <Text style={[styles.dueTableHeaderText, styles.dueColMonth]}>Month</Text>
+                               <Text style={[styles.dueTableHeaderText, styles.dueColMonth]}>Maturity</Text>
+                               <Text style={[styles.dueTableHeaderText, styles.dueColDue]}>Due</Text>
+                               <Text style={[styles.dueTableHeaderText, styles.dueColAmount]}>Amount</Text>
                             </View>
                             <View style={styles.dueTableValueRow}>
-                              <Text style={[styles.dueGroupAmount, styles.dueColAmount]}>₹{dueAmount.toFixed(2)}</Text>
-                              <Text style={[styles.dueTableValueText, styles.dueColDue]}>{dueLabel}</Text>
-                              <Text style={[styles.dueTableValueText, styles.dueColMonth]}>{monthText}</Text>
+                               <Text style={[styles.dueTableValueText, styles.dueColMonth]}>{monthText}</Text>
+                               <Text style={[styles.dueTableValueText, styles.dueColDue]}>{dueLabel}</Text>
+                               <Text style={[styles.dueGroupAmount, styles.dueColAmount]}>₹{dueAmount.toFixed(2)}</Text>
                             </View>
 
                             <TouchableOpacity
@@ -554,19 +499,6 @@ export default function PayDueScreen({ navigation }: Props) {
 
                   
 
-                  {/* <TouchableOpacity
-                    style={styles.showMoreButton}
-                    activeOpacity={0.8}
-                    onPress={() => handleShowMore(item)}
-                    disabled={isShowMoreLoading}
-                  >
-                    <Text style={styles.showMoreButtonText}>{isExpanded ? 'Hide' : 'Show More'}</Text>
-                    <Ionicons
-                      name={isExpanded ? 'chevron-up-outline' : 'chevron-down-outline'}
-                      size={16}
-                      color="#2BC0AC"
-                    />
-                  </TouchableOpacity> */}
 
                   {isExpanded ? (
                     <View style={styles.showMoreContainer}>
@@ -773,6 +705,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: '#888',
     fontWeight: '600',
+    textAlign:'right'
   },
   dueTableValueText: {
     fontSize: 13,
@@ -790,13 +723,14 @@ const styles = StyleSheet.create({
   },
   dueColMonth: {
     flex: 1,
-    textAlign: 'right',
+    textAlign: 'left',
     fontSize: 13,
   },
   dueGroupAmount: {
     fontSize: 16,
     color: '#E94560',
     fontWeight: '700',
+     textAlign: 'right',
   },
   detailRow: {
     flexDirection: 'row',

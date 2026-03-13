@@ -21,6 +21,7 @@ import SilverImage from '../assets/silver.png';
 import { API_ENDPOINTS } from '../config/env';
 import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import RenderHtml from 'react-native-render-html';
 
 
 type Props = CompositeScreenProps<
@@ -215,7 +216,7 @@ export default function HomeScreen({ navigation }: Props) {
             onPageSelected={(e) => setActiveSlide(e.nativeEvent.position)}
           >
             {homeData?.banners && homeData.banners.map((banner: any,index: number) => (
-              <View key={index+1} style={{height: 200, width: '100%',paddingHorizontal:10,marginTop:20,borderRadius: 12}}>
+              <View key={index+1} style={{height: 200, width: '100%',paddingHorizontal:10,marginTop:15,borderRadius: 12}}>
                 <Image 
                   source={{ uri: getBannerImageUri(banner?.url) }}
                   style={{height:130, width: '100%', borderRadius: 12,shadowColor: '#000',
@@ -252,9 +253,51 @@ export default function HomeScreen({ navigation }: Props) {
           
           <View style={styles.welcomeTextContainer}>
             <Text style={styles.welcomeTitle}>{homeData?.title}</Text>
-            <Text style={styles.welcomeDescription}>
-              {homeData?.desc}
-            </Text>
+            <View style={styles.welcomeDescriptionPreview}>
+              <RenderHtml
+                contentWidth={width - 20}
+                source={{ html: homeData?.desc || '' }}
+                baseStyle={styles.welcomeDescription}
+                defaultTextProps={{ numberOfLines: 3, ellipsizeMode: 'tail' }}
+                  tagsStyles={{
+              p: {
+                marginBottom: 12,
+                textAlign: 'justify',
+              },
+              h1: {
+                fontSize: 22,
+                fontWeight: '700',
+                color: '#333',
+                marginBottom: 12,
+              },
+              h2: {
+                fontSize: 20,
+                fontWeight: '600',
+                color: '#333',
+                marginBottom: 12,
+              },
+              h3: {
+                fontSize: 18,
+                fontWeight: '500',
+                color: '#333',
+                marginBottom: 12,
+              },
+              b:{
+                fontWeight: '700',
+                //color: '#333',
+              }
+            }}
+              />
+            </View>
+            {Boolean(homeData?.desc) && (
+              <TouchableOpacity
+                style={styles.showMoreButton}
+                onPress={() => navigation.navigate('AboutUs')}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.showMoreText}>Show more</Text>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
 
@@ -427,17 +470,32 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   welcomeDescription: {
-    fontSize: 14,
-    color: '#666',
-    textAlign: 'center',
-    lineHeight: 16,
+    fontSize: 15,
+   // color: '#666',
+   // textAlign: 'center',
+    lineHeight: 20,
+    paddingHorizontal: 10,
+  },
+  welcomeDescriptionPreview: {
+    //maxHeight: 60,
+    overflow: 'hidden',
+  },
+  showMoreButton: {
+    alignSelf: 'flex-end',
+    marginTop: 8,
+    marginRight: 10,
+  },
+  showMoreText: {
+    fontSize: 13,
+    color: '#2BC0AC',
+    fontWeight: '600',
   },
   featuresGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-evenly',
     paddingHorizontal: 10,
-    marginTop: 20,
+    marginTop: 15,
     // padding: 10,
     gap: 10,
   },

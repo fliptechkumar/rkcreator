@@ -47,11 +47,14 @@ export default function RegisterScreen({ navigation }: Props) {
   const [countryId, setCountryId] = useState<number | null>(null);
   const [stateId, setStateId] = useState<number | null>(null);
   const [countrySearch, setCountrySearch] = useState('');
+  const [stateSearch, setStateSearch] = useState('');
   const [showCountryList, setShowCountryList] = useState(false);
   const [showStateList, setShowStateList] = useState(false);
 
   useEffect(() => {
+    setCountryId(49);
     loadCountries();
+    loadStates(49); // Load states for India by default
   }, []);
 
   const extractOptions = (responseData: any): Array<any> => {
@@ -63,9 +66,9 @@ export default function RegisterScreen({ navigation }: Props) {
       return responseData.data;
     }
 
-    if (Array.isArray(responseData?.countries)) {
-      return responseData.countries;
-    }
+    // if (Array.isArray(responseData?.countries)) {
+    //   return responseData.countries;
+    // }
 
     if (Array.isArray(responseData?.states)) {
       return responseData.states;
@@ -80,9 +83,7 @@ export default function RegisterScreen({ navigation }: Props) {
 
   const normalizeOption = (item: any): { id: number; name: string } | null => {
     const id = Number(item?.id ?? item?.country_id ?? item?.state_id ?? item?.value);
-    const name = String(
-      item?.name ?? item?.country ?? item?.state ?? item?.country_name ?? item?.state_name ?? item?.label ?? '',
-    ).trim();
+    const name = String(item?.state).trim();
 
     if (!Number.isFinite(id) || !name) {
       return null;
@@ -126,11 +127,12 @@ export default function RegisterScreen({ navigation }: Props) {
       });
 
       const responseData = await response.json();
+      console.log('State fetch response:', responseData);
       const rawOptions = extractOptions(responseData);
       const mapped = rawOptions
         .map(normalizeOption)
         .filter((item): item is StateOption => item !== null);
-
+      console.log('Mapped states:', mapped);
       setStates(mapped);
     } catch (error) {
       console.error('State fetch error:', error);
@@ -140,6 +142,7 @@ export default function RegisterScreen({ navigation }: Props) {
   const selectedCountryName = countries.find((item) => item.id === countryId)?.name || 'Select Country';
   const selectedStateName = states.find((item) => item.id === stateId)?.name || 'Select State';
   const normalizedCountrySearch = countrySearch.trim().toLowerCase();
+  const normalizedStateSearch = stateSearch.trim().toLowerCase();
   const filteredCountries = [...countries]
     .sort((a, b) => {
       const aIsIndia = a.name.toLowerCase() === 'india';
@@ -156,6 +159,7 @@ export default function RegisterScreen({ navigation }: Props) {
       return a.name.localeCompare(b.name);
     })
     .filter((item) => item.name.toLowerCase().includes(normalizedCountrySearch));
+  const filteredStates = [...states].filter((item) => item.name.toLowerCase().includes(normalizedStateSearch));
 
   const handleSelectCountry = (id: number) => {
     setCountryId(id);
@@ -169,6 +173,7 @@ export default function RegisterScreen({ navigation }: Props) {
 
   const handleSelectState = (id: number) => {
     setStateId(id);
+    setStateSearch('');
     setShowStateList(false);
   };
 
@@ -209,8 +214,8 @@ export default function RegisterScreen({ navigation }: Props) {
       return;
     }
 
-    if (!countryId || !stateId) {
-      setErrorMessage('Please select country and state');
+    if (!stateId) {
+      setErrorMessage('Please select state');
       return;
     }
 
@@ -261,12 +266,12 @@ export default function RegisterScreen({ navigation }: Props) {
   };
 
   return (
-  <SafeAreaView style={styles.safeArea} edges={['top','left','right']}>
+  <SafeAreaView style={styles.safeArea} edges={['top','left','right','bottom']}>
        <StatusBar barStyle="dark-content" backgroundColor="#2BC0AC" />
 
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="#fff" />
+          <Ionicons name="arrow-back" size={28} color="#fff" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Register</Text>
         <View style={styles.headerRight} />
@@ -325,28 +330,10 @@ export default function RegisterScreen({ navigation }: Props) {
                 editable={!loading}
               />
 
-              <Text style={styles.label}>Address</Text>
-              <TextInput
-                style={[styles.textInput, styles.multilineInput]}
-                placeholder="Enter address"
-                placeholderTextColor="#999"
-                value={address}
-                onChangeText={setAddress}
-                multiline
-                editable={!loading}
-              />
+             
 
-              <Text style={styles.label}>City</Text>
-              <TextInput
-                style={styles.textInput}
-                placeholder="Enter city"
-                placeholderTextColor="#999"
-                value={city}
-                onChangeText={setCity}
-                editable={!loading}
-              />
-
-              <Text style={styles.label}>Country</Text>
+            
+              {/* <Text style={styles.label}>Country</Text>
               <TouchableOpacity
                 style={styles.selectorInput}
                 onPress={() => {
@@ -391,18 +378,25 @@ export default function RegisterScreen({ navigation }: Props) {
                     )}
                   </ScrollView>
                 </View>
-              ) : null}
+              ) : null} */}
 
               <Text style={styles.label}>State</Text>
               <TouchableOpacity
                 style={styles.selectorInput}
                 onPress={() => {
-                  if (!countryId) {
-                    return;
-                  }
+                   setShowStateList((prev) => {
+                    const next = !prev;
+                    if (next) {
+                      setStateSearch('');
+                    }
+                    return next;
+                  });
+                  // if (!countryId) {
+                  //   return;
+                  // }
 
-                  setShowStateList((prev) => !prev);
-                  setShowCountryList(false);
+                  // setShowStateList((prev) => !prev);
+                  // setShowCountryList(false);
                 }}
                 disabled={loading}
               >
@@ -412,9 +406,17 @@ export default function RegisterScreen({ navigation }: Props) {
 
               {showStateList ? (
                 <View style={styles.optionList}>
+                  <TextInput
+                    style={styles.searchInput}
+                    placeholder="Search state"
+                    placeholderTextColor="#999"
+                    value={stateSearch}
+                    onChangeText={setStateSearch}
+                    editable={!loading}
+                  />
                   <ScrollView nestedScrollEnabled keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator>
-                    {states.length ? (
-                      states.map((item) => (
+                    {filteredStates.length ? (
+                      filteredStates.map((item) => (
                         <TouchableOpacity
                           key={item.id}
                           style={styles.optionItem}
@@ -424,11 +426,32 @@ export default function RegisterScreen({ navigation }: Props) {
                         </TouchableOpacity>
                       ))
                     ) : (
-                      <Text style={styles.optionEmptyText}>No states available</Text>
+                      <Text style={styles.optionEmptyText}>No states found</Text>
                     )}
                   </ScrollView>
                 </View>
               ) : null}
+
+                <Text style={styles.label}>City</Text>
+              <TextInput
+                style={styles.textInput}
+                placeholder="Enter city"
+                placeholderTextColor="#999"
+                value={city}
+                onChangeText={setCity}
+                editable={!loading}
+              />
+               <Text style={styles.label}>Address</Text>
+              <TextInput
+                style={[styles.textInput, styles.multilineInput]}
+                placeholder="Enter address"
+                placeholderTextColor="#999"
+                value={address}
+                onChangeText={setAddress}
+                multiline
+                editable={!loading}
+              />
+
 
               <Text style={styles.label}>Postcode</Text>
               <TextInput
@@ -495,7 +518,7 @@ export default function RegisterScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-   // backgroundColor: '#fff',
+    backgroundColor: '#2BC0AC',
   },
   container: {
     flex: 1,
@@ -507,6 +530,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 10,
     paddingVertical: 10,
+    height: 70,
   },
   backButton: {
     width: 40,

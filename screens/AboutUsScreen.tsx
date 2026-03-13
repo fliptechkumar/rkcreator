@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   StatusBar,
-  Image,
+  useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -14,6 +14,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { API_ENDPOINTS } from '../config/env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import RenderHtml from 'react-native-render-html';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'AboutUs'>;
 
@@ -21,6 +22,7 @@ export default function AboutUsScreen({ navigation }: Props) {
     const [loading, setLoading] = React.useState<boolean>(true);
     const [customerId, setCustomerId] = React.useState<string>('');
     const [aboutUsContent, setAboutUsContent] = React.useState<any>('');
+  const { width } = useWindowDimensions();
     React.useEffect(() => {
       GetAboutus();
     }, []);
@@ -95,9 +97,39 @@ export default function AboutUsScreen({ navigation }: Props) {
             <Ionicons name="book-outline" size={24} color="#2BC0AC" />
             <Text style={styles.sectionTitle}>{aboutUsContent?.title}</Text>
           </View> */}
-          <Text style={styles.sectionText}>
-            {aboutUsContent?.desc}
-          </Text>
+          <RenderHtml
+            contentWidth={width - 40}
+            source={{ html: aboutUsContent?.desc || '' }}
+            baseStyle={styles.sectionText}
+            tagsStyles={{
+              p: {
+                marginBottom: 12,
+                textAlign: 'justify',
+              },
+              h1: {
+                fontSize: 22,
+                fontWeight: '700',
+                color: '#333',
+                marginBottom: 12,
+              },
+              h2: {
+                fontSize: 20,
+                fontWeight: '600',
+                color: '#333',
+                marginBottom: 12,
+              },
+              h3: {
+                fontSize: 18,
+                fontWeight: '500',
+                color: '#333',
+                marginBottom: 12,
+              },
+              b:{
+                fontWeight: '700',
+                //color: '#333',
+              }
+            }}
+          />
         
         </View>
 

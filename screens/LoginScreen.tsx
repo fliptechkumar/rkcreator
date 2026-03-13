@@ -752,11 +752,11 @@ export default function LoginScreen({ navigation }: Props) {
                     />
                   ))}
                 </View>
-                {tempOtp ? (
+                {/* {tempOtp ? (
                   <Text style={{ textAlign: 'center', color: '#666', marginBottom: 8 }}>
                     (For testing purposes, your OTP is: {tempOtp})
                   </Text>
-                ) : null}
+                ) : null} */}
 
                 {otpError ? (
                   <View style={styles.errorContainer}>

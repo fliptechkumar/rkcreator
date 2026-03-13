@@ -7,6 +7,7 @@ import {
   ScrollView,
   StatusBar,
   ActivityIndicator,
+  useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -14,6 +15,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { API_ENDPOINTS } from '../config/env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import RenderHtml from 'react-native-render-html';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'TermsConditions'>;
 
@@ -21,6 +23,7 @@ export default function TermsConditionsScreen({ navigation }: Props) {
   const [loading, setLoading] = React.useState<boolean>(true);
   const [customerId, setCustomerId] = React.useState<string>('');
   const [termsContent, setTermsContent] = React.useState<any>(null);
+  const { width } = useWindowDimensions();
 
   React.useEffect(() => {
     GetTermsConditions();
@@ -99,7 +102,42 @@ export default function TermsConditionsScreen({ navigation }: Props) {
 
           {/* Terms Content */}
           <View style={styles.section}>
-            <Text style={styles.sectionContent}>{termsContent?.desc}</Text>
+            <RenderHtml
+              contentWidth={width - 40}
+              source={{ html: termsContent?.desc || '' }}
+              baseStyle={styles.sectionContent}
+                tagsStyles={{
+              p: {
+                marginBottom: 12,
+                textAlign: 'justify',
+              },
+              h1: {
+                fontSize: 22,
+                fontWeight: '700',
+                color: '#333',
+                marginBottom: 12,
+              },
+              h2: {
+                fontSize: 20,
+                fontWeight: '600',
+                color: '#333',
+                marginBottom: 12,
+              },
+              h3: {
+                fontSize: 18,
+                fontWeight: '500',
+                color: '#333',
+                marginBottom: 12,
+              },
+              b:{
+                fontWeight: '700',
+                //color: '#333',
+              },
+              span: {
+                color: '#333',
+              }
+            }}
+            />
           </View>
 
           {/* Footer */}

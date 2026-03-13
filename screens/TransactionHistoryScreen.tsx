@@ -40,6 +40,7 @@ export default function TransactionHistoryScreen({ navigation }: Props) {
       // Try with fetch to have more control
       let url = `${API_ENDPOINTS.TRANSACTIONHISTORY}?id=${userId}`;
       if (schemeId) url += `&customer_scheme_id=${schemeId}`;
+      console.log('Transaction History URL:', url);
       const response = await fetch(url, {
         method: 'GET',
        headers: {
@@ -52,11 +53,10 @@ export default function TransactionHistoryScreen({ navigation }: Props) {
       });
       
       const responseData = await response.json();
-      console.log('Transaction History Response:', responseData);
+     // console.log('Transaction History Response:', responseData.data[0]);
       if (responseData && responseData.success) {
-       
       // Handle successful response
-      console.log('Sign-in successful:', responseData.data);
+      //console.log('Sign-in successful:', responseData.data);
       setTransactionData(responseData.data);
       } else {
         // Handle error response
@@ -86,7 +86,7 @@ export default function TransactionHistoryScreen({ navigation }: Props) {
         const userDetailsString = await AsyncStorage.getItem('userDetails');
         if (userDetailsString) {
           const userDetails = JSON.parse(userDetailsString);
-          console.log('User Details from AsyncStorage:', userDetails.id);
+         // console.log('User Details from AsyncStorage:', userDetails.id);
           if (userDetails && userDetails.id) {
             GETTRANSACTION(userDetails.id);
             setCustomerId(userDetails.id);
@@ -102,68 +102,7 @@ export default function TransactionHistoryScreen({ navigation }: Props) {
       console.error('Error retrieving userDetails from AsyncStorage:', error);
     }
   }
-  const transactions: Transaction[] = [
-    {
-      id: '1',
-      type: 'credit',
-      title: 'Gold Scheme Payment',
-      description: 'Monthly installment',
-      amount: 5000,
-      date: '28 Dec 2025',
-      time: '10:30 AM',
-      status: 'completed',
-    },
-    {
-      id: '2',
-      type: 'debit',
-      title: 'Jewellery Purchase',
-      description: 'Gold necklace - 22KT',
-      amount: 45000,
-      date: '25 Dec 2025',
-      time: '02:15 PM',
-      status: 'completed',
-    },
-    {
-      id: '3',
-      type: 'credit',
-      title: 'Scheme Deposit',
-      description: 'Wedding scheme',
-      amount: 10000,
-      date: '20 Dec 2025',
-      time: '11:45 AM',
-      status: 'completed',
-    },
-    {
-      id: '4',
-      type: 'debit',
-      title: 'Silver Coins',
-      description: '100g Silver coins',
-      amount: 8100,
-      date: '15 Dec 2025',
-      time: '04:20 PM',
-      status: 'completed',
-    },
-    {
-      id: '5',
-      type: 'credit',
-      title: 'Monthly Savings',
-      description: 'Recurring deposit',
-      amount: 3000,
-      date: '10 Dec 2025',
-      time: '09:00 AM',
-      status: 'pending',
-    },
-    {
-      id: '6',
-      type: 'debit',
-      title: 'Gold Earrings',
-      description: 'Traditional design',
-      amount: 25000,
-      date: '05 Dec 2025',
-      time: '03:30 PM',
-      status: 'completed',
-    },
-  ];
+
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -196,7 +135,12 @@ export default function TransactionHistoryScreen({ navigation }: Props) {
       const responseData = await response.text();
       console.log('Invoice Response Data:', responseData);
       if (responseData) {
-        navigation.getParent()?.navigate('Invoice' as any, { html: responseData });
+        if(customer_scheme_id) {
+          navigation.navigate('Invoice' as any, { html: responseData, schemeId: customer_scheme_id });
+        } else {
+            navigation.getParent()?.navigate('Invoice' as any, { html: responseData });
+        }
+      
       }
     } catch (error) {
       console.error('Error fetching invoice:', error);

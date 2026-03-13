@@ -341,12 +341,12 @@ export default function PayDueDetailsScreen({ navigation, route }: Props) {
               label="Total Amount"
               value={`₹${Number(details.total_paid_amount).toFixed(2)}`}
             />
-            <DetailRow
+            {/* <DetailRow
               label="Paid Amount"
               value={`₹${Number(details.payed_amount).toFixed(2)}`}
-            />
+            /> */}
             <DetailRow
-              label="Gold Weight"
+              label="Acc. weight"
               value={`${Number(details.total_gold_weight).toFixed(3)}g`}
             />
             <DetailRow
@@ -364,11 +364,11 @@ export default function PayDueDetailsScreen({ navigation, route }: Props) {
               value={details.total_installment}
             />
             <DetailRow
-              label="Installment Count"
+              label="Paid Count"
               value={details.installment_count}
             />
             {/* <DetailRow label="Pending Payments" value={details.del_payment_count} /> */}
-            <DetailRow label="Duration Type" value={details.duration_type} />
+            {/* <DetailRow label="Duration Type" value={details.duration_type} /> */}
           </View>
 
           {/* Date Info Section */}

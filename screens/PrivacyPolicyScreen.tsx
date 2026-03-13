@@ -7,6 +7,7 @@ import {
   ScrollView,
   StatusBar,
   ActivityIndicator,
+  useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -14,6 +15,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { API_ENDPOINTS } from '../config/env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import RenderHtml from 'react-native-render-html';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'PrivacyPolicy'>;
 
@@ -21,6 +23,7 @@ export default function PrivacyPolicyScreen({ navigation }: Props) {
   const [loading, setLoading] = React.useState<boolean>(true);
   const [customerId, setCustomerId] = React.useState<string>('');
   const [privacyContent, setPrivacyContent] = React.useState<any>(null);
+  const { width } = useWindowDimensions();
 
   React.useEffect(() => {
     GetPrivacyPolicy();
@@ -88,18 +91,53 @@ export default function PrivacyPolicyScreen({ navigation }: Props) {
           {/* Introduction */}
           <View style={styles.introSection}>
             <View style={styles.iconContainer}>
-              <Ionicons name="shield-checkmark" size={40} color="#2BC0AC" />
+              <Ionicons name="shield-checkmark" size={20} color="#2BC0AC" />
             </View>
             <Text style={styles.introTitle}>Your Privacy Matters</Text>
             <Text style={styles.introText}>
-              {privacyContent?.title || 'At Nezlan Jewellery, we are committed to protecting your privacy and ensuring the security of your personal information.'}
+              {privacyContent?.title }
             </Text>
-            <Text style={styles.lastUpdated}>Last Updated: January 1, 2026</Text>
+            {/* <Text style={styles.lastUpdated}>Last Updated: January 1, 2026</Text> */}
           </View>
 
           {/* Policy Content */}
           <View style={styles.section}>
-            <Text style={styles.sectionContent}>{privacyContent?.desc}</Text>
+            <RenderHtml
+              contentWidth={width - 40}
+              source={{ html: privacyContent?.desc || '' }}
+              baseStyle={styles.sectionContent}
+               tagsStyles={{
+              p: {
+                marginBottom: 12,
+                textAlign: 'justify',
+              },
+              h1: {
+                fontSize: 22,
+                fontWeight: '700',
+                color: '#333',
+                marginBottom: 12,
+              },
+              h2: {
+                fontSize: 20,
+                fontWeight: '600',
+                color: '#333',
+                marginBottom: 12,
+              },
+              h3: {
+                fontSize: 18,
+                fontWeight: '500',
+                color: '#333',
+                marginBottom: 12,
+              },
+              b:{
+                fontWeight: '700',
+                //color: '#333',
+              },
+              span: {
+                color: '#333',
+              }
+            }}
+            />
           </View>
 
           {/* Footer */}
@@ -162,9 +200,9 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   iconContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     backgroundColor: '#E8F8F5',
     justifyContent: 'center',
     alignItems: 'center',
@@ -182,7 +220,7 @@ const styles = StyleSheet.create({
     color: '#666',
     textAlign: 'center',
     lineHeight: 20,
-    marginBottom: 16,
+   // marginBottom: 16,
   },
   lastUpdated: {
     fontSize: 12,
