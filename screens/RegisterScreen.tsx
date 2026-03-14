@@ -7,17 +7,18 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
-  StatusBar,
   ActivityIndicator,
   ScrollView,
   Keyboard,
   TouchableWithoutFeedback,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { StatusBar } from 'expo-status-bar';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { API_ENDPOINTS } from '../config/env';
+import Toast from 'react-native-toast-message';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Register'>;
 
@@ -32,6 +33,7 @@ type StateOption = {
 };
 
 export default function RegisterScreen({ navigation }: Props) {
+  const insets = useSafeAreaInsets();
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -179,10 +181,6 @@ export default function RegisterScreen({ navigation }: Props) {
 
   const extractRegisteredCustomerId = (responseData: any): string | undefined => {
     const possibleIds = [
-      responseData?.customer_id,
-      responseData?.id,
-      responseData?.user_id,
-      responseData?.data?.id,
       responseData?.data?.customer_id,
       responseData?.data?.user?.id,
       responseData?.user?.id,
@@ -241,7 +239,7 @@ export default function RegisterScreen({ navigation }: Props) {
           email: email.trim(),
           address: address.trim(),
           city: city.trim(),
-          country_id: countryId,
+          // country_id: countryId,
           state_id: stateId,
           postcode: Number(postcode),
         }),
@@ -252,7 +250,12 @@ export default function RegisterScreen({ navigation }: Props) {
       if (responseData?.success) {
         setLoading(false);
         const registeredCustomerId = extractRegisteredCustomerId(responseData);
-        alert(responseData.message || 'Registration successful. Please complete KYC verification.');
+        console.log(responseData);
+        Toast.show({
+          type: 'success',
+          text1: 'Registration Successful',
+          text2: 'Please complete KYC verification.',
+        });
         navigation.replace('KycVerification', { customerId: registeredCustomerId });
         return;
       }
@@ -266,29 +269,32 @@ export default function RegisterScreen({ navigation }: Props) {
   };
 
   return (
-  <SafeAreaView style={styles.safeArea} edges={['top','left','right','bottom']}>
-       <StatusBar barStyle="dark-content" backgroundColor="#2BC0AC" />
+    <View style={styles.container}>
+      <StatusBar style="light" backgroundColor="#2BC0AC" />
+      <SafeAreaView style={styles.topSafeArea} edges={['top']}>
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+            <Ionicons name="arrow-back" size={28} color="#fff" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Register</Text>
+          <View style={styles.headerRight} />
+        </View>
+      </SafeAreaView>
 
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={28} color="#fff" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Register</Text>
-        <View style={styles.headerRight} />
-      </View>
-
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.container}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
-      >
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <ScrollView
-            contentContainerStyle={styles.scrollContent}
-            keyboardShouldPersistTaps="handled"
-            showsVerticalScrollIndicator={false}
-            nestedScrollEnabled
-          >
+      <SafeAreaView style={styles.bottomSafeArea} edges={['bottom']}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          style={styles.contentContainer}
+          keyboardVerticalOffset={0}
+        >
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <ScrollView
+              contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 28 }]}
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
+              nestedScrollEnabled
+              automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
+            >
             <View style={styles.inputSection}>
               <Text style={styles.label}>Customer Name</Text>
               <TextInput
@@ -489,8 +495,6 @@ export default function RegisterScreen({ navigation }: Props) {
               disabled={
                 !customerName.trim() ||
                 phoneNumber.length !== 10 ||
-                !email.trim() ||
-                !address.trim() ||
                 !city.trim() ||
                 !countryId ||
                 !stateId ||
@@ -507,21 +511,30 @@ export default function RegisterScreen({ navigation }: Props) {
                 </>
               )}
             </TouchableOpacity>
-            <View style={{ height: 30 }} />
-          </ScrollView>
-        </TouchableWithoutFeedback>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+            </ScrollView>
+          </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    </View>
+    
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#2BC0AC',
-  },
   container: {
     flex: 1,
+    backgroundColor: '#fff',
+  },
+  topSafeArea: {
+    backgroundColor: '#2BC0AC',
+  },
+  contentContainer: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  bottomSafeArea: {
+    flex: 1,
+    backgroundColor: '#fff',
   },
   header: {
     backgroundColor: '#2BC0AC',

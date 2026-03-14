@@ -7,16 +7,17 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
-  StatusBar,
   ActivityIndicator,
   ScrollView,
 } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import * as DocumentPicker from 'expo-document-picker';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { API_ENDPOINTS } from '../config/env';
+import Toast from 'react-native-toast-message';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'KycVerification'>;
 
@@ -34,7 +35,6 @@ export default function KycVerificationScreen({ navigation, route }: Props) {
       loading ||
       !taxNumber.trim() ||
       aadhaarNumber.trim().length !== 12 ||
-      !gstin.trim() ||
       !customerId,
     [loading, taxNumber, aadhaarNumber, gstin, customerId],
   );
@@ -71,10 +71,10 @@ export default function KycVerificationScreen({ navigation, route }: Props) {
       return;
     }
 
-    if (!gstin.trim()) {
-      setErrorMessage('GSTIN is required');
-      return;
-    }
+    // if (!gstin.trim()) {
+    //   setErrorMessage('GSTIN is required');
+    //   return;
+    // }
 
     if (!attachment) {
       setErrorMessage('Attachment is required');
@@ -110,7 +110,11 @@ export default function KycVerificationScreen({ navigation, route }: Props) {
 
       if (responseData?.success) {
         setLoading(false);
-        alert(responseData?.message || 'KYC submitted successfully.');
+        Toast.show({
+          type: 'success',
+          text1: 'KYC submitted successfully.',
+          text2:' Please wait for admin approval.',
+        });
         navigation.replace('Login');
         return;
       }
@@ -124,24 +128,31 @@ export default function KycVerificationScreen({ navigation, route }: Props) {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
-      <StatusBar barStyle="dark-content" backgroundColor="#2BC0AC" />
+    <View style={styles.container}>
+      <StatusBar style="light" backgroundColor="#2BC0AC" />
 
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="#fff" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Verify KYC</Text>
-        <View style={styles.headerRight} />
-      </View>
+      <SafeAreaView style={styles.topSafeArea} edges={['top']}>
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+            <Ionicons name="arrow-back" size={24} color="#fff" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Verify KYC</Text>
+          <View style={styles.headerRight} />
+        </View>
+      </SafeAreaView>
 
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.container}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
-      >
-        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-          <Text style={styles.subtitle}>Complete KYC to continue with your account.</Text>
+      <SafeAreaView style={styles.bottomSafeArea} edges={['bottom']}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          style={styles.contentContainer}
+          keyboardVerticalOffset={0}
+        >
+          <ScrollView
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+          >
+            <Text style={styles.subtitle}>Complete KYC to continue with your account.</Text>
 
           <Text style={styles.label}>Tax Number</Text>
           <TextInput
@@ -191,32 +202,42 @@ export default function KycVerificationScreen({ navigation, route }: Props) {
             </View>
           ) : null}
 
-          <TouchableOpacity
-            style={[styles.primaryButton, isDisabled && styles.buttonDisabled]}
-            onPress={handleSubmitKyc}
-            disabled={isDisabled}
-          >
-            {loading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <>
-                <Text style={styles.primaryButtonText}>Submit KYC</Text>
-                <Ionicons name="checkmark-circle" size={20} color="#fff" />
-              </>
-            )}
-          </TouchableOpacity>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+            <TouchableOpacity
+              style={[styles.primaryButton, isDisabled && styles.buttonDisabled]}
+              onPress={handleSubmitKyc}
+              disabled={isDisabled}
+            >
+              {loading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <>
+                  <Text style={styles.primaryButtonText}>Submit KYC</Text>
+                  <Ionicons name="checkmark-circle" size={20} color="#fff" />
+                </>
+              )}
+            </TouchableOpacity>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-  },
   container: {
     flex: 1,
+    backgroundColor: '#fff',
+  },
+  topSafeArea: {
+    backgroundColor: '#2BC0AC',
+  },
+  bottomSafeArea: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  contentContainer: {
+    flex: 1,
+    backgroundColor: '#fff',
   },
   header: {
     backgroundColor: '#2BC0AC',
