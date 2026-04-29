@@ -22,6 +22,8 @@ import { API_ENDPOINTS } from '../config/env';
 import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RenderHtml from 'react-native-render-html';
+// import Logo from "../assets/react-logo.png";
+import Logo from "../assets/logo.png";
 
 
 type Props = CompositeScreenProps<
@@ -171,10 +173,13 @@ export default function HomeScreen({ navigation }: Props) {
       {/* Header */}
       <View style={styles.header}>
         {/* <Text style={styles.logo}>Nezlan</Text> */}
-        <Image source={{ uri: 'https://jewel.rkcreators.com/uploads/store/300x3002.png' }} style={{width:100,height:40}} resizeMode='contain' />
-        <TouchableOpacity style={styles.notificationBtn}>
+        {/* <View style={{flex:1}}></View> */}
+        <View style={{}}>
+        <Image source={Logo} style={{width:80,height:50}} resizeMode="cover" />
+        </View>
+        <TouchableOpacity style={styles.notificationBtn} onPress={() => navigation.navigate('Profile')}>
           {/* <Text style={styles.bellIcon}>🔔</Text> */}
-          {/* <Ionicons name="notifications-outline" size={28} color="#fff" /> */}
+          <Ionicons name="person" size={28} color="#fff" />
         </TouchableOpacity>
       </View>
 
@@ -344,6 +349,7 @@ const styles = StyleSheet.create({
     fontFamily: 'System',
   },
   notificationBtn: {
+
     width: 40,
     height: 40,
     justifyContent: 'center',

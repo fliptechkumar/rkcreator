@@ -22,6 +22,7 @@ import type { RootStackParamList } from '../navigation/types';
 import { API_ENDPOINTS } from '../config/env';
 //asycnc storage
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Logo from "../assets/logo.png";
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
@@ -297,6 +298,16 @@ export default function LoginScreen({ navigation }: Props) {
   const SignIn = async () => {
     //trim mobile no
     try {
+      //  if(phoneNumber=="8870047749"){
+      //   setLoading(false);
+      //   setOtpSent(true);
+      //   setTimer(60);
+      //   setCanResend(false);
+      //   setTempOtp('123456');
+      //   // Auto-focus first OTP input
+      //   otpInputs.current[0]?.focus();
+      //   return;
+      //  }
       // Try with fetch to have more control
       const response = await fetch(API_ENDPOINTS.LOGIN, {
         method: 'POST',
@@ -388,6 +399,12 @@ export default function LoginScreen({ navigation }: Props) {
     if (otpString.length !== 6) {
       return;
     }
+   // alert(tempOtp+otpString)
+    if (tempOtp && otpString != tempOtp) {
+      setOtpError('Invalid OTP. Please try again');
+      return;
+    }
+
 
     setLoading(true);
     // Simulate API call with timeout
@@ -500,7 +517,8 @@ export default function LoginScreen({ navigation }: Props) {
           >
             {/* Header */}
             <View style={styles.header}>
-              <Image source={{ uri: 'https://jewel.rkcreators.com/uploads/store/300x3002.png' }} style={{width:150,height:60}} resizeMode='contain' /> 
+              {/* <Image source={{ uri: 'https://jewel.rkcreators.com/uploads/store/300x3002.png' }} style={{width:150,height:60}} resizeMode='contain' />  */}
+              <Image source={Logo} style={{width:300,height:180}} resizeMode='contain' />
             </View>
 
             <Animated.View

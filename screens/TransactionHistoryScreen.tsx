@@ -53,7 +53,7 @@ export default function TransactionHistoryScreen({ navigation }: Props) {
       });
       
       const responseData = await response.json();
-     // console.log('Transaction History Response:', responseData.data[0]);
+      console.log('Transaction History Response:', responseData.data[0]);
       if (responseData && responseData.success) {
       // Handle successful response
       //console.log('Sign-in successful:', responseData.data);
@@ -104,13 +104,12 @@ export default function TransactionHistoryScreen({ navigation }: Props) {
   }
 
 
+  const getPaymentStatusLabel = (paymentStatus?: string) => {
+    return String(paymentStatus || '').trim().toUpperCase() === 'SUCCESS' ? 'SUCCESS' : 'FAILED';
+  };
+
   const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'completed': return '#4CAF50';
-      case 'pending': return '#FF9800';
-      case 'failed': return '#F44336';
-      default: return '#999';
-    }
+    return status === 'SUCCESS' ? '#4CAF50' : '#F44336';
   };
 
   const getInvoice = async (transactionId: string) => {
@@ -169,8 +168,25 @@ export default function TransactionHistoryScreen({ navigation }: Props) {
 
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         <View style={styles.content}>
-          {transactionData && transactionData.map((transaction: any) => (
-            <View key={transaction.id} style={styles.card}>
+          {transactionData && transactionData.map((transaction: any) => {
+            const paymentStatusLabel = getPaymentStatusLabel(transaction.payment_status);
+            const paymentStatusColor = getStatusColor(paymentStatusLabel);
+
+            return (
+            <View
+              key={transaction.id}
+              style={[
+                styles.card,
+                {
+                  shadowColor: paymentStatusColor,
+                  borderLeftWidth: 4,
+                  borderLeftColor: paymentStatusColor,
+                },
+              ]}
+            >
+              <Text style={[styles.metaText, styles.statusMetaText, { color: paymentStatusColor }]}>
+                Payment Status: {paymentStatusLabel}
+              </Text>
               <View style={styles.cardHeader}>
                
                 <View style={styles.cardInfo}>
@@ -203,7 +219,8 @@ export default function TransactionHistoryScreen({ navigation }: Props) {
                 </View>
               </View>
             </View>
-          ))}
+            );
+          })}
         </View>
 
         <View style={styles.bottomSpacer} />
@@ -289,6 +306,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#777',
     marginTop: 2,
+  },
+  statusMetaText: {
+    fontWeight: '700',
+    marginBottom: 8,
+    marginTop: 0,
   },
   amountContainer: {
     alignItems: 'flex-end',

@@ -1,7 +1,7 @@
 // Environment Configuration
 export const ENV = {
-  API_BASE_URL:'https://jewel.rkcreators.com/nezlan_api', // 'https://mrschains.nezlan.in/nezlan_api',
-  PAYMENT_URL: 'https://jewel.rkcreators.com/',
+  API_BASE_URL: 'https://djjewellery.nezlan.in/nezlan_api', //'https://mrschains.nezlan.in/nezlan_api' , //'https://jewel.rkcreators.com/nezlan_api', // 'https://mrschains.nezlan.in/nezlan_api',
+  PAYMENT_URL: 'https://djjewellery.nezlan.in/', //'https://mrschains.nezlan.in/',       //'https://jewel.rkcreators.com/',
   RAZORPAY_KEY_ID: '',
 };
 

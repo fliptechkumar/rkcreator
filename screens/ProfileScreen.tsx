@@ -27,6 +27,7 @@ export default function ProfileScreen({ navigation }: Props) {
     name: 'Kumaravel Thangaraj',
     email: 'kumaran2489@example.com',
     phone: '+91 9994996019',
+    dateOfBirth: '',
     memberSince: 'January 2025',
     membershipId: 'NEG2025001',
     totalSavings: 125000,
@@ -45,6 +46,7 @@ export default function ProfileScreen({ navigation }: Props) {
               name: user.customer_name || 'User',
               email: user.email || '',
               phone: user.mobile ? `+91 ${user.mobile}` : '',
+              dateOfBirth: user.dob || '',
               memberSince: user.customer_created_date || 'January 2025',
               membershipId: user.customer_code || 'NEG2025001',
               totalSavings: parseFloat(user.total_savings || '0'),
@@ -197,6 +199,11 @@ export default function ProfileScreen({ navigation }: Props) {
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Customer ID</Text>
             <Text style={styles.infoValue}>{userProfile.membershipId}</Text>
+          </View>
+          <View style={styles.divider} />
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Date of Birth</Text>
+            <Text style={styles.infoValue}>{userProfile.dateOfBirth || '-'}</Text>
           </View>
           <View style={styles.divider} />
           <View style={styles.infoRow}>

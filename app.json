@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "nezlan",
+    "name": "Kurinji Jewellery",
     "slug": "nezlan",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -20,7 +20,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.rkcreater.neglan"
+      "package": "com.dhiya.nezlan"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -31,7 +31,8 @@
       }
     },
     "plugins": [
-      "expo-web-browser"
+      "expo-web-browser",
+      "@react-native-community/datetimepicker"
     ]
   }
 }

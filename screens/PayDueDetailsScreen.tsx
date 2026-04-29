@@ -175,21 +175,38 @@ export default function PayDueDetailsScreen({ navigation, route }: Props) {
       }
      // let paidAmount=amountNumber*100
 
-      var options = {
-        description: "Credits towards consultation",
-        image: "https://jewel.rkcreators.com/uploads/site/300x3001.png",
+
+       var options = {
+        description: "Payment for installment - " + details?.scheme_name,
+        image: "https://djjewellery.nezlan.in/uploads/store/DJJewellery_logo.png",
         currency: "INR",
-        key: "rzp_test_SFHGcfzQqiClGg", // Your Razorpay Key Id
+        key:"rzp_live_SgUshqrEdNXF0M", // "rzp_live_ScA1021QMJkQ8C", // Your Razorpay Key Id
         amount: String(amount), // Amount in paise
-        name: "Nezlan Jewel",
+        name: "Dhiya Jewels",
         order_id: orderId, //Replace this with an order_id created using Orders API.
         prefill: {
           email: userEmail,
-          contact: "+919994996019", //userContact,
+          contact: userContact,
           name: userName,
         },
         theme: { color: "#2BC0AC" },
       };
+
+      // var options = {
+      //   description: "Credits towards consultation",
+      //   image: "https://jewel.rkcreators.com/uploads/site/300x3001.png",
+      //   currency: "INR",
+      //   key: "rzp_test_SFHGcfzQqiClGg", // Your Razorpay Key Id
+      //   amount: String(amount), // Amount in paise
+      //   name: "Nezlan Jewel",
+      //   order_id: orderId, //Replace this with an order_id created using Orders API.
+      //   prefill: {
+      //     email: userEmail,
+      //     contact: "+919994996019", //userContact,
+      //     name: userName,
+      //   },
+      //   theme: { color: "#2BC0AC" },
+      // };
       RazorpayCheckout.open(options)
         .then((data) => {
           console.log("Razorpay Payment Success:", data);

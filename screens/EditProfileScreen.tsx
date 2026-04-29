@@ -10,7 +10,9 @@ import {
   Image,
   ActivityIndicator,
   Alert,
+  Platform,
 } from 'react-native';
+import DateTimePicker, { type DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -25,6 +27,9 @@ export default function EditProfileScreen({ navigation }: Props) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+  const [dateOfBirth, setDateOfBirth] = useState('');
+  const [dobDate, setDobDate] = useState<Date>(new Date(2000, 0, 1));
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [address, setAddress] = useState('');
   const [city, setCity] = useState('');
   const [state, setState] = useState('');
@@ -43,6 +48,7 @@ export default function EditProfileScreen({ navigation }: Props) {
             setName(user.customer_name || '');
             setEmail(user.email || '');
             setPhone(user.mobile || '');
+            setDateOfBirth(user.date_of_birth || '');
             setAddress(user.address || '');
             setCity(user.city || '');
             setState(user.state || '');
@@ -56,6 +62,24 @@ export default function EditProfileScreen({ navigation }: Props) {
       loadUserProfile();
     }, [])
   );
+
+  const formatDate = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const handleChangeDate = (event: DateTimePickerEvent, selectedDate?: Date) => {
+    if (Platform.OS === 'android') {
+      setShowDatePicker(false);
+    }
+
+    if (event.type === 'set' && selectedDate) {
+      setDobDate(selectedDate);
+      setDateOfBirth(formatDate(selectedDate));
+    }
+  };
 
   const handleSave = async () => {
     if (!name || !email || !phone) {
@@ -78,6 +102,7 @@ export default function EditProfileScreen({ navigation }: Props) {
           customer_name: name,
           email: email,
           mobile: phone,
+          // date_of_birth: dateOfBirth,
           address: address,
           city: city,
           // state: state,
@@ -98,6 +123,7 @@ export default function EditProfileScreen({ navigation }: Props) {
             customer_name: name,
             email: email,
             mobile: phone,
+            date_of_birth: dateOfBirth,
             address: address,
             city: city,
             state: state,
@@ -200,6 +226,41 @@ export default function EditProfileScreen({ navigation }: Props) {
                 keyboardType="phone-pad"
               />
             </View>
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Date of Birth</Text>
+            <TouchableOpacity
+              style={[styles.inputContainer, { justifyContent: 'space-between' }]}
+              onPress={() => setShowDatePicker(true)}
+            >
+              <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+                <Ionicons name="calendar-outline" size={20} color="#666" />
+                <Text style={[styles.input, { color: dateOfBirth ? '#333' : '#999' }]}>
+                  {dateOfBirth || 'Select date'}
+                </Text>
+              </View>
+            </TouchableOpacity>
+
+            {showDatePicker ? (
+              <View style={styles.datePickerContainer}>
+                <DateTimePicker
+                  value={dobDate}
+                  mode="date"
+                  display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                  maximumDate={new Date()}
+                  onChange={handleChangeDate}
+                />
+                {Platform.OS === 'ios' ? (
+                  <TouchableOpacity
+                    style={styles.datePickerDoneButton}
+                    onPress={() => setShowDatePicker(false)}
+                  >
+                    <Text style={styles.datePickerDoneText}>Done</Text>
+                  </TouchableOpacity>
+                ) : null}
+              </View>
+            ) : null}
           </View>
 
           <View style={styles.inputGroup}>
@@ -408,6 +469,26 @@ const styles = StyleSheet.create({
   },
   halfWidth: {
     flex: 1,
+  },
+  datePickerContainer: {
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    borderRadius: 10,
+    marginTop: 10,
+    backgroundColor: '#fff',
+    overflow: 'hidden',
+  },
+  datePickerDoneButton: {
+    alignItems: 'flex-end',
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#EFEFEF',
+  },
+  datePickerDoneText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#2BC0AC',
   },
   optionsSection: {
     backgroundColor: '#fff',

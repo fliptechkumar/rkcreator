@@ -154,17 +154,17 @@ export default function KycVerificationScreen({ navigation, route }: Props) {
           >
             <Text style={styles.subtitle}>Complete KYC to continue with your account.</Text>
 
-          <Text style={styles.label}>Tax Number</Text>
+          <Text style={styles.label}>PAN number<Text style={styles.requiredAsterisk}> *</Text></Text>
           <TextInput
             style={styles.textInput}
-            placeholder="Enter tax number"
+            placeholder="Enter PAN number"
             placeholderTextColor="#999"
             value={taxNumber}
             onChangeText={setTaxNumber}
             editable={!loading}
           />
 
-          <Text style={styles.label}>Aadhaar Number</Text>
+          <Text style={styles.label}>Aadhaar Number<Text style={styles.requiredAsterisk}> *</Text></Text>
           <TextInput
             style={styles.textInput}
             placeholder="Enter 12-digit Aadhaar number"
@@ -187,7 +187,7 @@ export default function KycVerificationScreen({ navigation, route }: Props) {
             editable={!loading}
           />
 
-          <Text style={styles.label}>Attachment</Text>
+          <Text style={styles.label}>Attachment<Text style={styles.requiredAsterisk}> *</Text></Text>
           <TouchableOpacity style={styles.attachmentButton} onPress={pickAttachment} disabled={loading}>
             <Ionicons name="attach" size={18} color="#2BC0AC" />
             <Text style={styles.attachmentText} numberOfLines={1}>
@@ -277,6 +277,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#333',
     marginBottom: 10,
+  },
+  requiredAsterisk: {
+    color: '#E94560',
   },
   textInput: {
     fontSize: 16,

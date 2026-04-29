@@ -247,20 +247,36 @@ export default function NewSchemesScreen({ navigation }: Props) {
       }
       console.log('Razorpay prefill details:', { userEmail, userContact, userName,orderId });
 
-      const options = {
-        description: 'Join scheme payment',
-        image: 'https://jewel.rkcreators.com/uploads/site/300x3001.png',
-        currency: 'INR',
-        key: 'rzp_test_SFHGcfzQqiClGg',
-        amount: amount,
-        name: 'Nezlan Jewel',
-        order_id: orderId,
+      // const options = {
+      //   description: 'Join scheme payment',
+      //   image: 'https://jewel.rkcreators.com/uploads/site/300x3001.png',
+      //   currency: 'INR',
+      //   key: 'rzp_test_SFHGcfzQqiClGg',
+      //   amount: amount,
+      //   name: 'Nezlan Jewel',
+      //   order_id: orderId,
+      //   prefill: {
+      //     email: userEmail,
+      //     contact: userContact,
+      //     name: userName,
+      //   },
+      //   theme: { color: '#2BC0AC' },
+      // };
+
+       var options = {
+        description: "Payment for New Scheme - " + scheme.name,
+        image: "https://djjewellery.nezlan.in/uploads/store/DJJewellery_logo.png",
+        currency: "INR",
+        key: "rzp_live_SgUshqrEdNXF0M", //"rzp_live_ScA1021QMJkQ8C", // Your Razorpay Key Id
+        amount: String(amount), // Amount in paise
+        name: "Dhiya Jewels",
+        order_id: orderId, //Replace this with an order_id created using Orders API.
         prefill: {
           email: userEmail,
           contact: userContact,
           name: userName,
         },
-        theme: { color: '#2BC0AC' },
+        theme: { color: "#2BC0AC" },
       };
 
       RazorpayCheckout.open(options)

@@ -12,6 +12,7 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
 } from 'react-native';
+import DateTimePicker, { type DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -40,6 +41,9 @@ export default function RegisterScreen({ navigation }: Props) {
   const [customerName, setCustomerName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [email, setEmail] = useState('');
+  const [dateOfBirth, setDateOfBirth] = useState('');
+  const [dobDate, setDobDate] = useState<Date>(new Date(2000, 0, 1));
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [address, setAddress] = useState('');
   const [city, setCity] = useState('');
   const [postcode, setPostcode] = useState('');
@@ -179,6 +183,24 @@ export default function RegisterScreen({ navigation }: Props) {
     setShowStateList(false);
   };
 
+  const formatDate = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const handleChangeDate = (event: DateTimePickerEvent, selectedDate?: Date) => {
+    if (Platform.OS === 'android') {
+      setShowDatePicker(false);
+    }
+
+    if (event.type === 'set' && selectedDate) {
+      setDobDate(selectedDate);
+      setDateOfBirth(formatDate(selectedDate));
+    }
+  };
+
   const extractRegisteredCustomerId = (responseData: any): string | undefined => {
     const possibleIds = [
       responseData?.data?.customer_id,
@@ -204,6 +226,12 @@ export default function RegisterScreen({ navigation }: Props) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email.trim())) {
       setErrorMessage('Enter a valid email address');
+      return;
+    }
+
+    const dobRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!dobRegex.test(dateOfBirth.trim())) {
+      setErrorMessage('Enter date of birth in YYYY-MM-DD format');
       return;
     }
 
@@ -237,6 +265,7 @@ export default function RegisterScreen({ navigation }: Props) {
           customer_name: customerName.trim(),
           mobile: phoneNumber,
           email: email.trim(),
+          date_of_birth: dateOfBirth.trim(),
           address: address.trim(),
           city: city.trim(),
           // country_id: countryId,
@@ -296,7 +325,7 @@ export default function RegisterScreen({ navigation }: Props) {
               automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
             >
             <View style={styles.inputSection}>
-              <Text style={styles.label}>Customer Name</Text>
+              <Text style={styles.label}>Customer Name<Text style={styles.requiredAsterisk}> *</Text></Text>
               <TextInput
                 style={styles.textInput}
                 placeholder="Enter customer name"
@@ -306,7 +335,7 @@ export default function RegisterScreen({ navigation }: Props) {
                 editable={!loading}
               />
 
-              <Text style={styles.label}>Phone Number</Text>
+              <Text style={styles.label}>Phone Number<Text style={styles.requiredAsterisk}> *</Text></Text>
               <View style={styles.phoneInputContainer}>
                 <View style={styles.countryCode}>
                   <Text style={styles.countryCodeText}>+91</Text>
@@ -324,7 +353,7 @@ export default function RegisterScreen({ navigation }: Props) {
                 />
               </View>
 
-              <Text style={styles.label}>Email</Text>
+              <Text style={styles.label}>Email<Text style={styles.requiredAsterisk}> *</Text></Text>
               <TextInput
                 style={styles.textInput}
                 placeholder="Enter email"
@@ -335,6 +364,38 @@ export default function RegisterScreen({ navigation }: Props) {
                 autoCapitalize="none"
                 editable={!loading}
               />
+
+              <Text style={styles.label}>Date of Birth<Text style={styles.requiredAsterisk}> *</Text></Text>
+              <TouchableOpacity
+                style={styles.selectorInput}
+                onPress={() => setShowDatePicker(true)}
+                disabled={loading}
+              >
+                <Text style={[styles.selectorText, !dateOfBirth && styles.placeholderText]}>
+                  {dateOfBirth || 'Select date (YYYY-MM-DD)'}
+                </Text>
+                <Ionicons name="calendar-outline" size={18} color="#666" />
+              </TouchableOpacity>
+
+              {showDatePicker ? (
+                <View style={styles.datePickerContainer}>
+                  <DateTimePicker
+                    value={dobDate}
+                    mode="date"
+                    display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                    maximumDate={new Date()}
+                    onChange={handleChangeDate}
+                  />
+                  {Platform.OS === 'ios' ? (
+                    <TouchableOpacity
+                      style={styles.datePickerDoneButton}
+                      onPress={() => setShowDatePicker(false)}
+                    >
+                      <Text style={styles.datePickerDoneText}>Done</Text>
+                    </TouchableOpacity>
+                  ) : null}
+                </View>
+              ) : null}
 
              
 
@@ -386,7 +447,7 @@ export default function RegisterScreen({ navigation }: Props) {
                 </View>
               ) : null} */}
 
-              <Text style={styles.label}>State</Text>
+              <Text style={styles.label}>State<Text style={styles.requiredAsterisk}> *</Text></Text>
               <TouchableOpacity
                 style={styles.selectorInput}
                 onPress={() => {
@@ -438,7 +499,7 @@ export default function RegisterScreen({ navigation }: Props) {
                 </View>
               ) : null}
 
-                <Text style={styles.label}>City</Text>
+                <Text style={styles.label}>City<Text style={styles.requiredAsterisk}> *</Text></Text>
               <TextInput
                 style={styles.textInput}
                 placeholder="Enter city"
@@ -447,7 +508,7 @@ export default function RegisterScreen({ navigation }: Props) {
                 onChangeText={setCity}
                 editable={!loading}
               />
-               <Text style={styles.label}>Address</Text>
+               <Text style={styles.label}>Address<Text style={styles.requiredAsterisk}> *</Text></Text>
               <TextInput
                 style={[styles.textInput, styles.multilineInput]}
                 placeholder="Enter address"
@@ -459,7 +520,7 @@ export default function RegisterScreen({ navigation }: Props) {
               />
 
 
-              <Text style={styles.label}>Postcode</Text>
+              <Text style={styles.label}>Postcode<Text style={styles.requiredAsterisk}> *</Text></Text>
               <TextInput
                 style={styles.textInput}
                 placeholder="Enter postcode"
@@ -484,6 +545,7 @@ export default function RegisterScreen({ navigation }: Props) {
                 (!customerName.trim() ||
                   phoneNumber.length !== 10 ||
                   !email.trim() ||
+                  !dateOfBirth.trim() ||
                   !address.trim() ||
                   !city.trim() ||
                   !countryId ||
@@ -495,6 +557,7 @@ export default function RegisterScreen({ navigation }: Props) {
               disabled={
                 !customerName.trim() ||
                 phoneNumber.length !== 10 ||
+                !dateOfBirth.trim() ||
                 !city.trim() ||
                 !countryId ||
                 !stateId ||
@@ -574,6 +637,9 @@ const styles = StyleSheet.create({
     color: '#333',
     marginBottom: 10,
   },
+  requiredAsterisk: {
+    color: '#E94560',
+  },
   phoneInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -631,6 +697,29 @@ const styles = StyleSheet.create({
   selectorText: {
     fontSize: 16,
     color: '#333',
+  },
+  placeholderText: {
+    color: '#999',
+  },
+  datePickerContainer: {
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    borderRadius: 10,
+    marginBottom: 14,
+    backgroundColor: '#fff',
+    overflow: 'hidden',
+  },
+  datePickerDoneButton: {
+    alignItems: 'flex-end',
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#EFEFEF',
+  },
+  datePickerDoneText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#2BC0AC',
   },
   optionList: {
     maxHeight: 180,
