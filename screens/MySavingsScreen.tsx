@@ -1,5 +1,5 @@
 import React ,{ useCallback }from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, StatusBar, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, StatusBar, Image, ImageBackground } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
@@ -7,6 +7,7 @@ import type { NavigationProp } from '@react-navigation/native';
 import type { RootStackParamList, TabParamList } from '../navigation/types';
 import { useFocusEffect } from '@react-navigation/native';
 import { API_ENDPOINTS } from '../config/env';
+import { Colors } from '../config/colors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import GoldImage from '../assets/gold.png';
 import SilverImage from '../assets/silver.png';
@@ -163,7 +164,7 @@ export default function MySavingsScreen({ navigation }: Props) {
       case 'gold': return '#FFD700';
       case 'silver': return '#C0C0C0';
       case 'diamond': return '#B9F2FF';
-      default: return '#2BC0AC';
+      default: return Colors.primary;
     }
   };
 
@@ -182,7 +183,7 @@ export default function MySavingsScreen({ navigation }: Props) {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <StatusBar barStyle="light-content" backgroundColor="#2BC0AC" />
+      <StatusBar barStyle="light-content" backgroundColor={Colors.primary} />
       
       {/* Header */}
       <View style={styles.header}>
@@ -192,12 +193,14 @@ export default function MySavingsScreen({ navigation }: Props) {
         </TouchableOpacity> */}
       </View>
 
+      <ImageBackground source={require("../assets/bg.jpeg")} style={styles.backgroundImage} resizeMode="cover" >
+        {/* <View style={styles.whiteOverlay} /> */}
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         {/* Summary Cards */}
         <View style={styles.summaryContainer}>
           <View style={styles.summaryCard}>
             <View style={styles.summaryIconContainer}>
-              <MaterialIcons name="account-balance-wallet" size={20} color="#2BC0AC" />
+              <MaterialIcons name="account-balance-wallet" size={20} color={Colors.primary} />
             </View>
             <Text style={styles.summaryValue}>₹{savingsData?.scheme_savings_details?.total_savings ? Number(savingsData?.scheme_savings_details?.total_savings).toFixed(0) : '0.00'}</Text>
             <Text style={styles.summaryLabel}>Total Savings</Text>
@@ -356,6 +359,7 @@ export default function MySavingsScreen({ navigation }: Props) {
 
         <View style={styles.bottomSpacer} />
       </ScrollView>
+      </ImageBackground>
     </SafeAreaView>
   );
 }
@@ -363,7 +367,7 @@ export default function MySavingsScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#2BC0AC',
+    backgroundColor: Colors.primary,
   },
   header: {
     flexDirection: 'row',
@@ -371,7 +375,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 15,
-    backgroundColor: '#2BC0AC',
+    backgroundColor: Colors.primary,
   },
   headerTitle: {
     fontSize: 18,
@@ -381,9 +385,16 @@ const styles = StyleSheet.create({
   addButton: {
     padding: 4,
   },
+  backgroundImage: {
+    flex: 1,
+  },
+  whiteOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(255, 255, 255, 0.4)',
+  },
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: 'transparent',
   },
   summaryContainer: {
     flexDirection: 'row',
@@ -516,7 +527,7 @@ const styles = StyleSheet.create({
   depositedAmount: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#2BC0AC',
+    color: Colors.primary,
   },
   targetAmount: {
     fontSize: 13,
@@ -544,7 +555,7 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     flex: 1,
-    backgroundColor: '#2BC0AC',
+    backgroundColor: Colors.primary,
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',
@@ -552,7 +563,7 @@ const styles = StyleSheet.create({
   actionButtonOutline: {
     backgroundColor: 'transparent',
     borderWidth: 1,
-    borderColor: '#2BC0AC',
+    borderColor: Colors.primary,
   },
   actionButtonText: {
     fontSize: 14,
@@ -562,7 +573,7 @@ const styles = StyleSheet.create({
   actionButtonTextOutline: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#2BC0AC',
+    color: Colors.primary,
   },
   bottomSpacer: {
     height: 20,

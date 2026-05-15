@@ -20,6 +20,7 @@ import type { RootStackParamList } from '../navigation/types';
 import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_ENDPOINTS } from '../config/env';
+import { Colors } from '../config/colors';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'EditProfile'>;
 
@@ -147,7 +148,7 @@ export default function EditProfileScreen({ navigation }: Props) {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <StatusBar barStyle="light-content" backgroundColor="#2BC0AC" />
+      <StatusBar barStyle="light-content" backgroundColor={Colors.primary} />
 
       {/* Header */}
       <View style={styles.header}>
@@ -172,7 +173,7 @@ export default function EditProfileScreen({ navigation }: Props) {
         <View style={styles.profileSection}>
           <View style={styles.profileImageContainer}>
             <View style={styles.profileImage}>
-              <Ionicons name="person" size={60} color="#2BC0AC" />
+              <Ionicons name="person" size={60} color={Colors.primary} />
             </View>
             <TouchableOpacity style={styles.cameraButton}>
               <Ionicons name="camera" size={20} color="#fff" />
@@ -367,7 +368,7 @@ export default function EditProfileScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#2BC0AC',
+    backgroundColor: Colors.primary,
   },
   header: {
     flexDirection: 'row',
@@ -375,7 +376,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 15,
-    backgroundColor: '#2BC0AC',
+    backgroundColor: Colors.primary,
   },
   backButton: {
     width: 40,
@@ -422,7 +423,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#2BC0AC',
+    backgroundColor: Colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 3,
@@ -430,7 +431,7 @@ const styles = StyleSheet.create({
   },
   changePhotoText: {
     fontSize: 14,
-    color: '#2BC0AC',
+    color: Colors.primary,
     fontWeight: '600',
   },
   formSection: {
@@ -488,7 +489,7 @@ const styles = StyleSheet.create({
   datePickerDoneText: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#2BC0AC',
+    color: Colors.primary,
   },
   optionsSection: {
     backgroundColor: '#fff',

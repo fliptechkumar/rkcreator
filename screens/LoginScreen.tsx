@@ -14,15 +14,17 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
   Image,
+  ImageBackground,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { API_ENDPOINTS } from '../config/env';
+import { Colors } from '../config/colors';
 //asycnc storage
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Logo from "../assets/logo.png";
+import Logo from "../assets/logonew1.png";
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
@@ -503,7 +505,10 @@ export default function LoginScreen({ navigation }: Props) {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <StatusBar barStyle="light-content" backgroundColor="#2BC0AC" />
+      <StatusBar barStyle="dark-content" backgroundColor={Colors.primaryLight} />
+      <ImageBackground source={require("../assets/bg.jpeg")} style={styles.backgroundImage} resizeMode="cover" >
+      
+
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.container}
@@ -517,8 +522,9 @@ export default function LoginScreen({ navigation }: Props) {
           >
             {/* Header */}
             <View style={styles.header}>
-              {/* <Image source={{ uri: 'https://jewel.rkcreators.com/uploads/store/300x3002.png' }} style={{width:150,height:60}} resizeMode='contain' />  */}
-              <Image source={Logo} style={{width:300,height:180}} resizeMode='contain' />
+              <View style={{flex:1}}>
+                <Image source={Logo} style={styles.logoImage} resizeMode="contain" />
+              </View>
             </View>
 
             <Animated.View
@@ -716,7 +722,7 @@ export default function LoginScreen({ navigation }: Props) {
 
               <>
                 <View style={styles.securityNote}>
-                  <Ionicons name="shield-checkmark" size={20} color="#2BC0AC" />
+                  <Ionicons name="shield-checkmark" size={20} color={Colors.primary} />
                   <Text style={styles.securityText}>
                     We'll send you a 6-digit OTP for verification
                   </Text>
@@ -730,9 +736,9 @@ export default function LoginScreen({ navigation }: Props) {
             // OTP Verification Screen
             <>
               <View style={styles.welcomeSection}>
-                <View style={styles.otpIconContainer}>
-                  <Ionicons name="mail-unread" size={50} color="#2BC0AC" />
-                </View>
+                {/* <View style={styles.otpIconContainer}>
+                  <Ionicons name="mail-unread" size={50} color={Colors.primary} />
+                </View> */}
                 <Text style={styles.title}>Verify OTP</Text>
                 <Text style={styles.subtitle}>
                   We've sent a 6-digit code to{'\n'}
@@ -830,6 +836,7 @@ export default function LoginScreen({ navigation }: Props) {
           </ScrollView>
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
+      </ImageBackground>
     </SafeAreaView>
   );
 }
@@ -837,14 +844,21 @@ export default function LoginScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#fff',
+   // backgroundColor: Colors.primaryLight,
+  },
+  backgroundImage: {
+    flex: 1,
+  },
+  whiteOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(255, 255, 255, 0.4)',
   },
   container: {
     flex: 1,
   },
   scrollContent: {
     flexGrow: 1,
-    backgroundColor: '#fff',
+    backgroundColor: 'transparent',
   },
   header: {
     alignItems: 'center',
@@ -852,14 +866,33 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     // flex:1
     // backgroundColor: '#2BC0AC',
-    paddingTop: 100,
+    paddingTop: 50,
     // paddingBottom: 20,
   },
+  logoCircle: {
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    overflow: 'hidden',
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  logoImage: {
+    width: '100%',
+    height: 160,
+  },
   logoContainer: {
-    width: 150,
+    width: 200,
     height: 100,
     borderRadius: 50,
-    backgroundColor: '#E8F8F5',
+    backgroundColor: Colors.primaryMuted,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 12,
@@ -867,7 +900,7 @@ const styles = StyleSheet.create({
   brandName: {
     fontSize: 36,
     fontWeight: '700',
-    color: '#2BC0AC',
+    color: Colors.primary,
     letterSpacing: 1,
   },
   brandTagline: {
@@ -883,13 +916,13 @@ const styles = StyleSheet.create({
   },
   welcomeSection: {
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: 20,
   },
   otpIconContainer: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#E8F8F5',
+    backgroundColor: Colors.primaryMuted,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 20,
@@ -898,7 +931,7 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: '700',
     color: '#333',
-    marginBottom: 8,
+   // marginBottom: 8,
     textAlign: 'center',
   },
   subtitle: {
@@ -909,16 +942,16 @@ const styles = StyleSheet.create({
   },
   phoneNumberText: {
     fontWeight: '700',
-    color: '#2BC0AC',
+    color: Colors.primary,
   },
   changeNumberText: {
     fontSize: 14,
-    color: '#2BC0AC',
+    color: Colors.primary,
     fontWeight: '600',
     marginTop: 12,
   },
   inputSection: {
-    marginBottom: 30,
+    marginBottom: 20,
   },
   label: {
     fontSize: 14,
@@ -929,14 +962,19 @@ const styles = StyleSheet.create({
   phoneInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F8F8F8',
+    backgroundColor: '#fff',
     borderRadius: 12,
-    borderWidth: 2,
-    borderColor: '#E0E0E0',
+    borderWidth: 1,
+    borderColor: Colors.primary,
     overflow: 'hidden',
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 6,
+    elevation: 4,
   },
   countryCode: {
-    backgroundColor: '#2BC0AC',
+    backgroundColor: Colors.primary,
     paddingHorizontal: 16,
     paddingVertical: 18,
   },
@@ -955,13 +993,18 @@ const styles = StyleSheet.create({
   textInput: {
     fontSize: 16,
     color: '#333',
-    backgroundColor: '#F8F8F8',
+    backgroundColor: '#fff',
     borderRadius: 12,
-    borderWidth: 2,
-    borderColor: '#E0E0E0',
+    borderWidth: 1.5,
+    borderColor: Colors.primary,
     paddingHorizontal: 16,
     paddingVertical: 14,
     marginBottom: 14,
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 3,
   },
   multilineInput: {
     minHeight: 80,
@@ -971,13 +1014,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#F8F8F8',
+    backgroundColor: '#fff',
     borderRadius: 12,
-    borderWidth: 2,
-    borderColor: '#E0E0E0',
+    borderWidth: 1.5,
+    borderColor: Colors.primary,
     paddingHorizontal: 16,
     paddingVertical: 14,
     marginBottom: 10,
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 3,
   },
   selectorText: {
     fontSize: 16,
@@ -1020,17 +1068,22 @@ const styles = StyleSheet.create({
     width: 50,
     height: 56,
     borderRadius: 12,
-    borderWidth: 2,
+    borderWidth: 1.5,
     borderColor: '#E0E0E0',
-    backgroundColor: '#F8F8F8',
+    backgroundColor: '#fff',
     fontSize: 24,
     fontWeight: '700',
     textAlign: 'center',
     color: '#333',
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 2,
   },
   otpInputFilled: {
-    borderColor: '#2BC0AC',
-    backgroundColor: '#E8F8F5',
+    borderColor: Colors.primary,
+    backgroundColor: Colors.primaryMuted,
   },
   otpInputError: {
     borderColor: '#E94560',
@@ -1058,26 +1111,26 @@ const styles = StyleSheet.create({
   },
   timerCountText: {
     fontWeight: '700',
-    color: '#2BC0AC',
+    color: Colors.primary,
   },
   resendText: {
     fontSize: 15,
-    color: '#2BC0AC',
+    color: Colors.primary,
     fontWeight: '600',
   },
   primaryButton: {
-    backgroundColor: '#2BC0AC',
+    backgroundColor: Colors.primary,
     borderRadius: 12,
     paddingVertical: 16,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    shadowColor: '#2BC0AC',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 5,
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.45,
+    shadowRadius: 10,
+    elevation: 7,
   },
   buttonDisabled: {
     backgroundColor: '#B0B0B0',
@@ -1108,7 +1161,7 @@ const styles = StyleSheet.create({
   },
   switchModeText: {
     fontSize: 14,
-    color: '#2BC0AC',
+    color: Colors.primary,
     fontWeight: '600',
   },
   footer: {
@@ -1122,7 +1175,7 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   footerLink: {
-    color: '#2BC0AC',
+    color: Colors.primary,
     fontWeight: '600',
   },
 });

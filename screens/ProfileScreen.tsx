@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, StatusBar, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, StatusBar, Alert, ImageBackground } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
@@ -8,6 +8,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { TabParamList, RootStackParamList } from '../navigation/types';
 import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Colors } from '../config/colors';
 
 type Props = CompositeScreenProps<
   BottomTabScreenProps<TabParamList, 'Profile'>,
@@ -109,7 +110,7 @@ export default function ProfileScreen({ navigation }: Props) {
       title: 'Notifications',
       icon: 'notifications-outline',
       iconFamily: 'ionicons',
-      onPress: () => console.log('Notifications'),
+      onPress: () => navigation.navigate('Notifications'),
     },
     // {
     //   id: '5',
@@ -151,13 +152,15 @@ export default function ProfileScreen({ navigation }: Props) {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <StatusBar barStyle="light-content" backgroundColor="#2BC0AC" />
+      <StatusBar barStyle="light-content" backgroundColor={Colors.primary} />
       
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Profile</Text>
       </View>
 
+      <ImageBackground source={require("../assets/bg.jpeg")} style={styles.backgroundImage} resizeMode="cover" imageStyle={{ opacity: 0.7 }}>
+        <View style={styles.whiteOverlay} />
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         {/* Profile Card */}
         <View style={styles.profileCard}>
@@ -246,6 +249,7 @@ export default function ProfileScreen({ navigation }: Props) {
 
         <View style={styles.bottomSpacer} />
       </ScrollView>
+      </ImageBackground>
     </SafeAreaView>
   );
 }
@@ -253,12 +257,12 @@ export default function ProfileScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#2BC0AC',
+    backgroundColor: Colors.primary,
   },
   header: {
     paddingHorizontal: 20,
     paddingVertical: 15,
-    backgroundColor: '#2BC0AC',
+    backgroundColor: Colors.primary,
     alignItems: 'center',
   },
   headerTitle: {
@@ -266,9 +270,16 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#fff',
   },
+  backgroundImage: {
+    flex: 1,
+  },
+  whiteOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(255, 255, 255, 0.4)',
+  },
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: 'transparent',
   },
   profileCard: {
     backgroundColor: '#fff',
@@ -292,7 +303,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#2BC0AC',
+    backgroundColor: Colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -308,7 +319,7 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: '#2BC0AC',
+    backgroundColor: Colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
@@ -365,7 +376,7 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#2BC0AC',
+    color: Colors.primary,
     marginBottom: 4,
   },
   statLabel: {

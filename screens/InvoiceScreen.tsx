@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Print from 'expo-print';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
+import { Colors } from '../config/colors';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Invoice'>;
 
@@ -40,7 +41,7 @@ export default function InvoiceScreen({ navigation, route }: Props) {
       startInLoadingState
       renderLoading={() => (
         <View style={styles.loader}>
-          <ActivityIndicator size="large" color="#2BC0AC" />
+          <ActivityIndicator size="large" color={Colors.primary} />
         </View>
       )}
       style={styles.webview}

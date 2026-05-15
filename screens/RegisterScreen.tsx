@@ -19,6 +19,7 @@ import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { API_ENDPOINTS } from '../config/env';
+import { Colors } from '../config/colors';
 import Toast from 'react-native-toast-message';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Register'>;
@@ -299,7 +300,7 @@ export default function RegisterScreen({ navigation }: Props) {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="light" backgroundColor="#2BC0AC" />
+      <StatusBar style="light" backgroundColor={Colors.primary} />
       <SafeAreaView style={styles.topSafeArea} edges={['top']}>
         <View style={styles.header}>
           <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
@@ -589,7 +590,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   topSafeArea: {
-    backgroundColor: '#2BC0AC',
+    backgroundColor: Colors.primary,
   },
   contentContainer: {
     flex: 1,
@@ -600,7 +601,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   header: {
-    backgroundColor: '#2BC0AC',
+    backgroundColor: Colors.primary,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -651,7 +652,7 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   countryCode: {
-    backgroundColor: '#2BC0AC',
+    backgroundColor: Colors.primary,
     paddingHorizontal: 16,
     paddingVertical: 18,
   },
@@ -719,7 +720,7 @@ const styles = StyleSheet.create({
   datePickerDoneText: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#2BC0AC',
+    color: Colors.primary,
   },
   optionList: {
     maxHeight: 180,
@@ -768,14 +769,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   primaryButton: {
-    backgroundColor: '#2BC0AC',
+    backgroundColor: Colors.primary,
     borderRadius: 12,
     paddingVertical: 16,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    shadowColor: '#2BC0AC',
+    shadowColor: Colors.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,

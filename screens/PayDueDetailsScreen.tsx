@@ -17,6 +17,7 @@ import { API_ENDPOINTS, ENV } from "../config/env";
 import RazorpayCheckout from "react-native-razorpay";
 import * as WebBrowser from "expo-web-browser";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Colors } from '../config/colors';
 
 type Props = NativeStackScreenProps<RootStackParamList, "PayDueDetails">;
 
@@ -178,18 +179,18 @@ export default function PayDueDetailsScreen({ navigation, route }: Props) {
 
        var options = {
         description: "Payment for installment - " + details?.scheme_name,
-        image: "https://djjewellery.nezlan.in/uploads/store/DJJewellery_logo.png",
+        image: ENV.RAZORPAY_IMAGE,
         currency: "INR",
-        key:"rzp_live_SgUshqrEdNXF0M", // "rzp_live_ScA1021QMJkQ8C", // Your Razorpay Key Id
-        amount: String(amount), // Amount in paise
-        name: "Dhiya Jewels",
+        key: ENV.RAZORPAY_KEY_ID,
+        amount: String(amount),
+        name: ENV.RAZORPAY_BUSINESS_NAME,
         order_id: orderId, //Replace this with an order_id created using Orders API.
         prefill: {
           email: userEmail,
           contact: userContact,
           name: userName,
         },
-        theme: { color: "#2BC0AC" },
+        theme: { color: Colors.primary },
       };
 
       // var options = {
@@ -205,7 +206,7 @@ export default function PayDueDetailsScreen({ navigation, route }: Props) {
       //     contact: "+919994996019", //userContact,
       //     name: userName,
       //   },
-      //   theme: { color: "#2BC0AC" },
+      //   theme: { color: Colors.primary },
       // };
       RazorpayCheckout.open(options)
         .then((data) => {
@@ -285,7 +286,7 @@ export default function PayDueDetailsScreen({ navigation, route }: Props) {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top"]}>
-      <StatusBar barStyle="light-content" backgroundColor="#2BC0AC" />
+      <StatusBar barStyle="light-content" backgroundColor={Colors.primary} />
 
       {/* Header */}
       <View style={styles.header}>
@@ -301,7 +302,7 @@ export default function PayDueDetailsScreen({ navigation, route }: Props) {
 
       {loading ? (
         <View style={styles.loaderContainer}>
-          <ActivityIndicator size="large" color="#2BC0AC" />
+          <ActivityIndicator size="large" color={Colors.primary} />
         </View>
       ) : details ? (
         <ScrollView
@@ -433,7 +434,7 @@ const DetailRow = ({ label, value }: { label: string; value: string }) => (
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#2BC0AC",
+    backgroundColor: Colors.primary,
   },
   header: {
     flexDirection: "row",
@@ -505,7 +506,7 @@ const styles = StyleSheet.create({
   statusAmount: {
     fontSize: 28,
     fontWeight: "700",
-    color: "#2BC0AC",
+    color: Colors.primary,
     marginBottom: 4,
   },
   statusLabel: {
@@ -554,11 +555,11 @@ const styles = StyleSheet.create({
   payButton: {
     marginHorizontal: 16,
     marginBottom: 20,
-    backgroundColor: "#2BC0AC",
+    backgroundColor: Colors.primary,
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: "center",
-    shadowColor: "#2BC0AC",
+    shadowColor: Colors.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,

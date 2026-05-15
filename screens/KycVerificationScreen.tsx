@@ -17,6 +17,7 @@ import * as DocumentPicker from 'expo-document-picker';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { API_ENDPOINTS } from '../config/env';
+import { Colors } from '../config/colors';
 import Toast from 'react-native-toast-message';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'KycVerification'>;
@@ -61,25 +62,25 @@ export default function KycVerificationScreen({ navigation, route }: Props) {
       return;
     }
 
-    if (!taxNumber.trim()) {
-      setErrorMessage('Tax number is required');
-      return;
-    }
+    // if (!taxNumber.trim()) {
+    //   setErrorMessage('Tax number is required');
+    //   return;
+    // }
 
-    if (aadhaarNumber.trim().length !== 12) {
-      setErrorMessage('Enter valid 12-digit Aadhaar number');
-      return;
-    }
+    // if (aadhaarNumber.trim().length !== 12) {
+    //   setErrorMessage('Enter valid 12-digit Aadhaar number');
+    //   return;
+    // }
 
     // if (!gstin.trim()) {
     //   setErrorMessage('GSTIN is required');
     //   return;
     // }
 
-    if (!attachment) {
-      setErrorMessage('Attachment is required');
-      return;
-    }
+    // if (!attachment) {
+    //   setErrorMessage('Attachment is required');
+    //   return;
+    // }
 
     setLoading(true);
     setErrorMessage('');
@@ -129,7 +130,7 @@ export default function KycVerificationScreen({ navigation, route }: Props) {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="light" backgroundColor="#2BC0AC" />
+      <StatusBar style="light" backgroundColor={Colors.primary} />
 
       <SafeAreaView style={styles.topSafeArea} edges={['top']}>
         <View style={styles.header}>
@@ -189,7 +190,7 @@ export default function KycVerificationScreen({ navigation, route }: Props) {
 
           <Text style={styles.label}>Attachment<Text style={styles.requiredAsterisk}> *</Text></Text>
           <TouchableOpacity style={styles.attachmentButton} onPress={pickAttachment} disabled={loading}>
-            <Ionicons name="attach" size={18} color="#2BC0AC" />
+            <Ionicons name="attach" size={18} color={Colors.primary} />
             <Text style={styles.attachmentText} numberOfLines={1}>
               {attachment?.name || 'Upload Aadhaar/PAN/GST document'}
             </Text>
@@ -229,7 +230,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   topSafeArea: {
-    backgroundColor: '#2BC0AC',
+    backgroundColor: Colors.primary,
   },
   bottomSafeArea: {
     flex: 1,
@@ -240,7 +241,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   header: {
-    backgroundColor: '#2BC0AC',
+    backgroundColor: Colors.primary,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -321,7 +322,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   primaryButton: {
-    backgroundColor: '#2BC0AC',
+    backgroundColor: Colors.primary,
     borderRadius: 12,
     paddingVertical: 16,
     flexDirection: 'row',

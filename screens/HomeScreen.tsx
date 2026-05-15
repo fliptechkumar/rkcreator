@@ -1,14 +1,17 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TouchableOpacity, 
-  ScrollView, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
   Image,
+  ImageBackground,
   Dimensions,
-  StatusBar
+  StatusBar,
+  ActivityIndicator,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import PagerView from 'react-native-pager-view';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
@@ -19,11 +22,12 @@ import { Ionicons } from '@expo/vector-icons';
 import GoldImage from '../assets/gold.png';
 import SilverImage from '../assets/silver.png';
 import { API_ENDPOINTS } from '../config/env';
+import { Colors } from '../config/colors';
 import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RenderHtml from 'react-native-render-html';
 // import Logo from "../assets/react-logo.png";
-import Logo from "../assets/logo.png";
+import Logo from "../assets/logonew1.png";
 
 
 type Props = CompositeScreenProps<
@@ -33,11 +37,32 @@ type Props = CompositeScreenProps<
 
 const { width } = Dimensions.get('window');
 
+type SchemeThemeColor =
+  | { type: 'solid'; value: string }
+  | { type: 'gradient'; gradient: { l1: string; l2: string } };
+
+interface HomeScheme {
+  id: number;
+  name: string;
+  duration: string;
+  monthlyAmount: string;
+  benefits: string;
+  description: string;
+  color: string;
+  groupName: string;
+  themeColor: SchemeThemeColor | null;
+  bannerImage: string | null;
+  schemeImage: string | null;
+}
+
 export default function HomeScreen({ navigation }: Props) {
   const [activeSlide, setActiveSlide] = useState(0);
   const pagerRef = useRef<PagerView>(null);
   const [homeData, setHomeData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const [homeSchemes, setHomeSchemes] = useState<HomeScheme[]>([]);
+  const [schemesLoading, setSchemesLoading] = useState(false);
+  const [customerId, setCustomerId] = useState<string>('');
 
   const getBannerImageUri = (url?: string) => {
     if (!url) return '';
@@ -70,9 +95,10 @@ export default function HomeScreen({ navigation }: Props) {
       const userDetailsString = await AsyncStorage.getItem('userDetails');
       if (userDetailsString) {
         const userDetails = JSON.parse(userDetailsString);
-        // console.log('User Details from AsyncStorage:', userDetails.id);
         if (userDetails && userDetails.id) {
+          setCustomerId(String(userDetails.id));
           GETHOME(userDetails.id);
+          fetchHomeSchemes(userDetails.id);
         } else {
           console.warn('User ID not found in userDetails');
         }
@@ -84,6 +110,59 @@ export default function HomeScreen({ navigation }: Props) {
       console.error('Error retrieving userDetails from AsyncStorage:', error);
     }
   }
+
+  const fetchHomeSchemes = async (userId: string) => {
+    try {
+      setSchemesLoading(true);
+      const response = await fetch(`${API_ENDPOINTS.NEWSCHEMES}?id=${userId}`, {
+        method: 'GET',
+        headers: { Accept: 'application/json', Internal: 'Nezlan', 'Content-Type': 'application/json' },
+        credentials: 'include',
+      });
+      const data = await response.json();
+      if (data?.success && data.data?.length > 0) {
+        setHomeSchemes(
+          data.data.map((item: any) => ({
+            id: item.id,
+            name: item.scheme_name || 'Savings Scheme',
+            duration: item.duration || '',
+            monthlyAmount: `₹${item.monthly_amount?.toLocaleString() || '0'}`,
+            benefits: item.benefits || 'Special benefits',
+            description: item.description || '',
+            color: item.banner?.theme_color?.type === 'solid'
+              ? item.banner.theme_color.value
+              : item.banner?.theme_color?.gradient?.l1 || '#C8952A',
+            groupName: item.group_name || '',
+            themeColor: item.banner?.theme_color ?? null,
+            bannerImage: item.banner?.images ?? null,
+            schemeImage: item.banner?.scheme_image ?? null,
+          }))
+        );
+      }
+    } catch (err) {
+      console.error('Error fetching home schemes:', err);
+    } finally {
+      setSchemesLoading(false);
+    }
+  };
+
+  const renderHomeSchemeBanner = (scheme: HomeScheme, children: React.ReactNode) => {
+    const tc = scheme.themeColor;
+    if (tc?.type === 'gradient') {
+      return (
+        <LinearGradient
+          colors={[tc.gradient.l1, tc.gradient.l2] as const}
+          start={{ x: 0, y: 0.5 }}
+          end={{ x: 1, y: 0.5 }}
+          style={styles.schemeCardGradient}
+        >
+          {children}
+        </LinearGradient>
+      );
+    }
+    const bg = tc?.type === 'solid' ? tc.value : '#B83020';
+    return <View style={[styles.schemeCardGradient, { backgroundColor: bg }]}>{children}</View>;
+  };
 
 
    const GETHOME = async (userId: string) => {
@@ -168,21 +247,18 @@ export default function HomeScreen({ navigation }: Props) {
 //navigation.navigate('VideoShopping')
   return (
     <SafeAreaView style={styles.safeArea} edges={['top','left','right']}>
-      <StatusBar barStyle="dark-content" backgroundColor="#2BC0AC" />
+      <StatusBar barStyle="dark-content" backgroundColor={Colors.primaryLight} />
       
       {/* Header */}
       <View style={styles.header}>
-        {/* <Text style={styles.logo}>Nezlan</Text> */}
-        {/* <View style={{flex:1}}></View> */}
-        <View style={{}}>
-        <Image source={Logo} style={{width:80,height:50}} resizeMode="cover" />
-        </View>
-        <TouchableOpacity style={styles.notificationBtn} onPress={() => navigation.navigate('Profile')}>
-          {/* <Text style={styles.bellIcon}>🔔</Text> */}
-          <Ionicons name="person" size={28} color="#fff" />
+        <Image source={Logo} style={styles.logoImage} resizeMode="contain" />
+        <TouchableOpacity style={styles.notificationBtn} onPress={() => navigation.navigate('Notifications')}>
+          <Ionicons name="notifications-outline" size={30} color={Colors.primary} />
         </TouchableOpacity>
       </View>
 
+      <ImageBackground source={require('../assets/bg.jpeg')} style={styles.backgroundImage} resizeMode="cover" >
+        {/* <View style={styles.whiteOverlay} /> */}
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         {/* Rate Cards */}
         <View style={styles.rateContainer}>
@@ -210,6 +286,20 @@ export default function HomeScreen({ navigation }: Props) {
             </View>
           </View>
         </View>
+
+        {homeData?.price_datetime && (
+          <Text style={styles.lastUpdateText}>
+            Last update on {homeData.price_datetime.date}
+            {' / '}
+            {(() => {
+              const [h, m] = (homeData.price_datetime.time || '').split(':');
+              const hour = parseInt(h, 10);
+              const ampm = hour >= 12 ? 'PM' : 'AM';
+              const hour12 = hour % 12 || 12;
+              return `${hour12}:${m} ${ampm}`;
+            })()}
+          </Text>
+        )}
 
         {/* Banner Carousel */}
         <View style={styles.bannerContainer}>
@@ -306,6 +396,90 @@ export default function HomeScreen({ navigation }: Props) {
           </View>
         </View>
 
+         {/* Schemes Section */}
+        <View style={styles.schemesSection}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Savings Schemes</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('NewSchemes')}>
+              <Text style={styles.seeAllText}>See All</Text>
+            </TouchableOpacity>
+          </View>
+
+           <Text style={{}}>
+            Choose from our flexible savings plans.
+          </Text>
+
+          {schemesLoading ? (
+            <ActivityIndicator size="small" color={Colors.primary} style={{ marginVertical: 20 }} />
+          ) : homeSchemes.length === 0 ? null : (
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.schemesScrollContent}
+            >
+              {homeSchemes.map((scheme, index) => (
+                <View key={`${scheme.id}-${index}`} style={styles.schemeCard}>
+                  {renderHomeSchemeBanner(scheme,
+                    <>
+                      {scheme.schemeImage ? (
+                        <Image source={{ uri: scheme.schemeImage }} style={styles.schemeLogoBadgeImage} resizeMode="contain" />
+                      ) : (
+                        <View style={styles.schemeLogoBadge}>
+                          <Text style={styles.schemeLogoBadgeText}>{scheme.groupName || 'DIGI GOLD'}</Text>
+                        </View>
+                      )}
+                      <View style={styles.schemeCardContent}>
+                        <View style={{ flex: 1, paddingRight: 8 }}>
+                          <Text style={styles.schemeCardTitle}>{scheme.name}</Text>
+                          <Text style={styles.schemeCardSubtitle}>
+                            {`Easy | Flexible | Convenient.\nStart with just ${scheme.monthlyAmount} | ${scheme.benefits}`}
+                          </Text>
+                        </View>
+                        {scheme.bannerImage ? (
+                          <Image source={{ uri: scheme.bannerImage }} style={styles.schemeBannerImage} resizeMode="contain" />
+                        ) : (
+                          <View style={styles.schemeGoldCoin}>
+                            <Text style={styles.schemeGoldCoinKarat}>22K</Text>
+                            <Text style={styles.schemeGoldCoinText}>GOLD</Text>
+                          </View>
+                        )}
+                      </View>
+                    </>
+                  )}
+                  <View style={styles.schemeCardButtons}>
+                    {/* <TouchableOpacity
+                      style={styles.schemeKnowMoreBtn}
+                      onPress={() => navigation.navigate('NewSchemes')}
+                    >
+                      <Text style={styles.schemeKnowMoreText}>Know More</Text>
+                    </TouchableOpacity>
+                    <View style={styles.schemeButtonDivider} /> */}
+                    <TouchableOpacity
+                      style={styles.schemeJoinBtn}
+                      onPress={() => navigation.navigate('SchemeDetails', {
+                        id: scheme.id,
+                        name: scheme.name,
+                        duration: scheme.duration,
+                        monthlyAmount: scheme.monthlyAmount,
+                        benefits: scheme.benefits,
+                        description: scheme.description,
+                        color: scheme.color,
+                        groupName: scheme.groupName,
+                        bannerImage: scheme.bannerImage,
+                        schemeImage: scheme.schemeImage,
+                        customerId,
+                      })}
+                    >
+                      <Text style={styles.schemeJoinText}>Join Now</Text>
+                    </TouchableOpacity>
+                  </View>
+                  
+                </View>
+              ))}
+            </ScrollView>
+          )}
+        </View>
+
         {/* Features Grid */}
         <View style={styles.featuresGrid}>
           {features.map((feature, index) => (
@@ -323,8 +497,11 @@ export default function HomeScreen({ navigation }: Props) {
           ))}
         </View>
 
+       
+
         <View style={styles.bottomSpacer} />
       </ScrollView>
+      </ImageBackground>
     </SafeAreaView>
   );
 }
@@ -332,7 +509,7 @@ export default function HomeScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#2BC0AC',
+    backgroundColor: Colors.primary,
   },
   header: {
     flexDirection: 'row',
@@ -340,7 +517,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 15,
-    backgroundColor: '#2BC0AC',
+    backgroundColor:Colors.white
   },
   logo: {
     fontSize: 38,
@@ -349,18 +526,58 @@ const styles = StyleSheet.create({
     fontFamily: 'System',
   },
   notificationBtn: {
-
     width: 40,
     height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  headerTextGroup: {
+    justifyContent: 'center',
+  },
+  headerBrand: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#fff',
+    letterSpacing: 0.3,
+  },
+  headerTagline: {
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.75)',
+    marginTop: 1,
+  },
+  profileBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
   },
   bellIcon: {
     fontSize: 28,
   },
+  backgroundImage: {
+    flex: 1,
+  },
+  whiteOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(255, 255, 255, 0.4)',
+  },
+  logoImage: {
+    width: 170,
+    height: 70,
+  },
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: 'transparent',
+  },
+  lastUpdateText: {
+    fontSize: 11,
+    color: '#888',
+    textAlign: 'right',
+    paddingHorizontal: 12,
+    paddingTop: 4,
+    paddingBottom: 2,
   },
   rateContainer: {
     flexDirection: 'row',
@@ -407,7 +624,7 @@ const styles = StyleSheet.create({
   rateValue: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#2BC0AC',
+    color: Colors.primary,
     marginBottom: 2,
   },
   rateSubtitle: {
@@ -493,7 +710,7 @@ const styles = StyleSheet.create({
   },
   showMoreText: {
     fontSize: 13,
-    color: '#2BC0AC',
+    color: Colors.primary,
     fontWeight: '600',
   },
   featuresGrid: {
@@ -542,5 +759,134 @@ const styles = StyleSheet.create({
   rateImage: {
     width: 30,
     height: 30,
+  },
+  schemesSection: {
+    marginTop: 15,
+    paddingHorizontal: 10,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#333',
+  },
+  seeAllText: {
+    fontSize: 13,
+    color: Colors.primary,
+    fontWeight: '600',
+  },
+  schemesScrollContent: {
+    gap: 12,
+    paddingRight: 10,
+    marginBottom:10
+  },
+  schemeCard: {
+    width: 270,
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.12,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  schemeCardGradient: {
+    padding: 14,
+    paddingBottom: 16,
+  },
+  schemeLogoBadge: {
+    backgroundColor: 'rgba(0,0,0,0.25)',
+    alignSelf: 'flex-start',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+    marginBottom: 10,
+  },
+  schemeLogoBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#fff',
+    letterSpacing: 0.5,
+  },
+  schemeLogoBadgeImage: {
+    width: 60,
+    height: 22,
+    marginBottom: 10,
+  },
+  schemeCardContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  schemeCardTitle: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#fff',
+    marginBottom: 6,
+  },
+  schemeCardSubtitle: {
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.9)',
+    lineHeight: 16,
+  },
+  schemeBannerImage: {
+    width: 64,
+    height: 64,
+    borderRadius: 8,
+  },
+  schemeGoldCoin: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#D4A017',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#F0C040',
+  },
+  schemeGoldCoinKarat: {
+    fontSize: 16,
+    fontWeight: '900',
+    color: '#7B4000',
+  },
+  schemeGoldCoinText: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: '#7B4000',
+    letterSpacing: 1,
+  },
+  schemeCardButtons: {
+    flexDirection: 'row',
+    borderTopWidth: 1,
+    borderTopColor: '#E0E0E0',
+  },
+  schemeKnowMoreBtn: {
+    flex: 1,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  schemeKnowMoreText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#333',
+  },
+  schemeButtonDivider: {
+    width: 1,
+    backgroundColor: '#E0E0E0',
+  },
+  schemeJoinBtn: {
+    flex: 1,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  schemeJoinText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#C05020',
   },
 });

@@ -14,6 +14,7 @@ import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { API_ENDPOINTS } from '../config/env';
+import { Colors } from '../config/colors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RenderHtml from 'react-native-render-html';
 
@@ -68,7 +69,7 @@ export default function PrivacyPolicyScreen({ navigation }: Props) {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <StatusBar barStyle="light-content" backgroundColor="#2BC0AC" />
+      <StatusBar barStyle="light-content" backgroundColor={Colors.primary} />
 
       {/* Header */}
       <View style={styles.header}>
@@ -84,14 +85,14 @@ export default function PrivacyPolicyScreen({ navigation }: Props) {
 
       {loading ? (
         <View style={styles.loaderContainer}>
-          <ActivityIndicator size="large" color="#2BC0AC" />
+          <ActivityIndicator size="large" color={Colors.primary} />
         </View>
       ) : (
         <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
           {/* Introduction */}
           <View style={styles.introSection}>
             <View style={styles.iconContainer}>
-              <Ionicons name="shield-checkmark" size={20} color="#2BC0AC" />
+              <Ionicons name="shield-checkmark" size={20} color={Colors.primary} />
             </View>
             <Text style={styles.introTitle}>Your Privacy Matters</Text>
             <Text style={styles.introText}>
@@ -142,7 +143,7 @@ export default function PrivacyPolicyScreen({ navigation }: Props) {
 
           {/* Footer */}
           <View style={styles.footer}>
-            <Ionicons name="information-circle-outline" size={24} color="#2BC0AC" />
+            <Ionicons name="information-circle-outline" size={24} color={Colors.primary} />
             <Text style={styles.footerText}>
               By using our services, you acknowledge that you have read and understood 
               this Privacy Policy.
@@ -159,7 +160,7 @@ export default function PrivacyPolicyScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#2BC0AC',
+    backgroundColor: Colors.primary,
   },
   header: {
     flexDirection: 'row',
@@ -167,7 +168,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 15,
-    backgroundColor: '#2BC0AC',
+    backgroundColor: Colors.primary,
   },
   backButton: {
     width: 40,

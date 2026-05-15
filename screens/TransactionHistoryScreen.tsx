@@ -1,5 +1,5 @@
 import React, { useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, StatusBar, Linking } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, StatusBar, Linking, ImageBackground } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
@@ -9,6 +9,7 @@ import type { RootStackParamList } from '../navigation/types';
 import { useRoute } from '@react-navigation/native';
 import { useFocusEffect } from '@react-navigation/native';
 import { API_ENDPOINTS } from '../config/env';
+import { Colors } from '../config/colors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type Props =
@@ -148,7 +149,7 @@ export default function TransactionHistoryScreen({ navigation }: Props) {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <StatusBar barStyle="light-content" backgroundColor="#2BC0AC" />
+      <StatusBar barStyle="light-content" backgroundColor={Colors.primary} />
       
       {/* Header */}
       <View style={styles.header}>
@@ -166,6 +167,8 @@ export default function TransactionHistoryScreen({ navigation }: Props) {
         <View style={styles.headerRight} />
       </View>
 
+      <ImageBackground source={require("../assets/bg.jpeg")} style={styles.backgroundImage} resizeMode="cover" >
+        {/* <View style={styles.whiteOverlay} /> */}
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         <View style={styles.content}>
           {transactionData && transactionData.map((transaction: any) => {
@@ -225,6 +228,7 @@ export default function TransactionHistoryScreen({ navigation }: Props) {
 
         <View style={styles.bottomSpacer} />
       </ScrollView>
+      </ImageBackground>
     </SafeAreaView>
   );
 }
@@ -232,7 +236,7 @@ export default function TransactionHistoryScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#2BC0AC',
+    backgroundColor: Colors.primary,
   },
   header: {
     flexDirection: 'row',
@@ -240,7 +244,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 15,
-    backgroundColor: '#2BC0AC',
+    backgroundColor: Colors.primary,
   },
   backButton: {
     width: 40,
@@ -258,9 +262,16 @@ const styles = StyleSheet.create({
   headerRight: {
     width: 40,
   },
+  backgroundImage: {
+    flex: 1,
+  },
+  whiteOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(255, 255, 255, 0.4)',
+  },
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: 'transparent',
   },
   content: {
     padding: 15,

@@ -1,11 +1,12 @@
 import React, { useCallback } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, StatusBar, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, StatusBar, ActivityIndicator, ImageBackground } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { useFocusEffect } from '@react-navigation/native';
-import { API_ENDPOINTS } from '../config/env';
+import { API_ENDPOINTS, ENV } from '../config/env';
+import { Colors } from '../config/colors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RazorpayCheckout from "react-native-razorpay";
 import Toast from 'react-native-toast-message';
@@ -269,22 +270,22 @@ export default function PayDueScreen({ navigation }: Props) {
       //     contact: userContact,
       //     name: userName,
       //   },
-      //   theme: { color: "#2BC0AC" },
+      //   theme: { color: Colors.primary },
       // };
  var options = {
         description: "Payment for installment",
-        image: "https://djjewellery.nezlan.in/uploads/store/DJJewellery_logo.png",
+        image: ENV.RAZORPAY_IMAGE,
         currency: "INR",
-        key: "rzp_live_SgUshqrEdNXF0M", //"rzp_live_ScA1021QMJkQ8C", // Your Razorpay Key Id
-        amount: String(amount), // Amount in paise
-        name: "Dhiya Jewels",
+        key: ENV.RAZORPAY_KEY_ID,
+        amount: String(amount),
+        name: ENV.RAZORPAY_BUSINESS_NAME,
         order_id: orderId, //Replace this with an order_id created using Orders API.
         prefill: {
           email: userEmail,
           contact: userContact,
           name: userName,
         },
-        theme: { color: "#2BC0AC" },
+        theme: { color: Colors.primary },
       };
       
       RazorpayCheckout.open(options)
@@ -391,7 +392,7 @@ export default function PayDueScreen({ navigation }: Props) {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <StatusBar barStyle="light-content" backgroundColor="#2BC0AC" />
+      <StatusBar barStyle="light-content" backgroundColor={Colors.primary} />
 
       {/* Header */}
       <View style={styles.header}>
@@ -405,11 +406,13 @@ export default function PayDueScreen({ navigation }: Props) {
         <View style={styles.headerRight} />
       </View>
 
+      <ImageBackground source={require("../assets/bg.jpeg")} style={styles.backgroundImage} resizeMode="cover" >
+        {/* <View style={styles.whiteOverlay} /> */}
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         <View style={styles.content}>
           {loading ? (
             <View style={styles.loaderContainer}>
-              <ActivityIndicator size="large" color="#2BC0AC" />
+              <ActivityIndicator size="large" color={Colors.primary} />
             </View>
           ) : payDueData && payDueData.length > 0 ? (
             payDueData.map((item: PayDueItem) => {
@@ -435,7 +438,7 @@ export default function PayDueScreen({ navigation }: Props) {
                         <Ionicons
                           name="wallet-outline"
                           size={20}
-                          color="#2BC0AC"
+                          color={Colors.primary}
                         />
                       </View>
                       <View style={styles.cardInfo}>
@@ -519,7 +522,7 @@ export default function PayDueScreen({ navigation }: Props) {
                   {isExpanded ? (
                     <View style={styles.showMoreContainer}>
                       {isShowMoreLoading ? (
-                        <ActivityIndicator size="small" color="#2BC0AC" />
+                        <ActivityIndicator size="small" color={Colors.primary} />
                       ) : listData.length > 0 ? (
                         listData.map((detail, index) => (
                           <View
@@ -549,7 +552,7 @@ export default function PayDueScreen({ navigation }: Props) {
             })
           ) : (
             <View style={styles.emptyContainer}>
-              <Ionicons name="checkmark-circle" size={60} color="#2BC0AC" />
+              <Ionicons name="checkmark-circle" size={60} color={Colors.primary} />
               <Text style={styles.emptyText}>No pending dues</Text>
               <Text style={styles.emptySubText}>All payments are up to date</Text>
             </View>
@@ -558,6 +561,7 @@ export default function PayDueScreen({ navigation }: Props) {
 
         <View style={styles.bottomSpacer} />
       </ScrollView>
+      </ImageBackground>
     </SafeAreaView>
   );
 }
@@ -565,7 +569,7 @@ export default function PayDueScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#2BC0AC',
+    backgroundColor: Colors.primary,
   },
   header: {
     flexDirection: 'row',
@@ -573,7 +577,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 15,
-    backgroundColor: '#2BC0AC',
+    backgroundColor: Colors.primary,
   },
   backButton: {
     width: 40,
@@ -591,9 +595,16 @@ const styles = StyleSheet.create({
   headerRight: {
     width: 40,
   },
+  backgroundImage: {
+    flex: 1,
+  },
+  whiteOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(255, 255, 255, 0.4)',
+  },
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: 'transparent',
   },
   content: {
     padding: 15,
@@ -662,7 +673,7 @@ const styles = StyleSheet.create({
   dueGroupsTitle: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#2BC0AC',
+    color: Colors.primary,
     marginBottom: 2,
   },
   dueGroupCard: {
@@ -710,7 +721,7 @@ const styles = StyleSheet.create({
   },
   dueGroupTag: {
     fontSize: 10,
-    color: '#2BC0AC',
+    color: Colors.primary,
     backgroundColor: '#EAF7F5',
     paddingHorizontal: 8,
     paddingVertical: 3,
@@ -776,7 +787,7 @@ const styles = StyleSheet.create({
     paddingBottom: 4,
   },
   showMoreButtonText: {
-    color: '#2BC0AC',
+    color: Colors.primary,
     fontSize: 13,
     fontWeight: '600',
     marginRight: 6,
@@ -805,7 +816,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   showMoreStatus: {
-    color: '#2BC0AC',
+    color: Colors.primary,
     fontSize: 12,
     marginTop: 4,
     textTransform: 'capitalize',
@@ -835,7 +846,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
   },
   payButton: {
-    backgroundColor: '#2BC0AC',
+    backgroundColor: Colors.primary,
     paddingVertical: 10,
     borderRadius: 8,
     alignItems: 'center',

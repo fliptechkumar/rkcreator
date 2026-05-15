@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
+import { Colors } from '../config/colors';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'VideoShopping'>;
 
@@ -138,7 +139,7 @@ export default function VideoShoppingScreen({ navigation }: Props) {
         <Text style={styles.productName} numberOfLines={2}>{product.name}</Text>
         <Text style={styles.productPrice}>{product.price}</Text>
         <TouchableOpacity style={styles.addToCartButton}>
-          <Ionicons name="cart-outline" size={16} color="#2BC0AC" />
+          <Ionicons name="cart-outline" size={16} color={Colors.primary} />
           <Text style={styles.addToCartText}>Add</Text>
         </TouchableOpacity>
       </View>
@@ -147,7 +148,7 @@ export default function VideoShoppingScreen({ navigation }: Props) {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <StatusBar barStyle="light-content" backgroundColor="#2BC0AC" />
+      <StatusBar barStyle="light-content" backgroundColor={Colors.primary} />
 
       {/* Header */}
       <View style={styles.header}>
@@ -167,7 +168,7 @@ export default function VideoShoppingScreen({ navigation }: Props) {
         {/* Info Banner */}
         <View style={styles.infoBanner}>
           <View style={styles.infoBannerIcon}>
-            <Ionicons name="videocam" size={24} color="#2BC0AC" />
+            <Ionicons name="videocam" size={24} color={Colors.primary} />
           </View>
           <View style={styles.infoBannerContent}>
             <Text style={styles.infoBannerTitle}>Shop Live with Experts</Text>
@@ -248,7 +249,7 @@ export default function VideoShoppingScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#2BC0AC',
+    backgroundColor: Colors.primary,
   },
   header: {
     flexDirection: 'row',
@@ -256,7 +257,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 15,
-    backgroundColor: '#2BC0AC',
+    backgroundColor: Colors.primary,
   },
   backButton: {
     width: 40,
@@ -339,7 +340,7 @@ const styles = StyleSheet.create({
   },
   seeAllText: {
     fontSize: 14,
-    color: '#2BC0AC',
+    color: Colors.primary,
     fontWeight: '600',
   },
   horizontalScroll: {
@@ -486,7 +487,7 @@ const styles = StyleSheet.create({
   productPrice: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#2BC0AC',
+    color: Colors.primary,
     marginBottom: 8,
   },
   addToCartButton: {
@@ -501,7 +502,7 @@ const styles = StyleSheet.create({
   addToCartText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#2BC0AC',
+    color: Colors.primary,
   },
   categoriesContainer: {
     flexDirection: 'row',

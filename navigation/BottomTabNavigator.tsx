@@ -9,6 +9,7 @@ import TransactionHistoryScreen from '../screens/TransactionHistoryScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import type { TabParamList } from './types';
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Colors } from '../config/colors';
 
 const Tab = createBottomTabNavigator<TabParamList>();
 
@@ -17,7 +18,7 @@ export default function BottomTabNavigator() {
   return (
     <Tab.Navigator
       screenOptions={{
-        tabBarActiveTintColor: '#2BC0AC',
+        tabBarActiveTintColor: Colors.primary,
         tabBarInactiveTintColor: '#999',
         headerShown: false,
         tabBarStyle: {
@@ -124,7 +125,7 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: '#2BC0AC',
+    backgroundColor: Colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',

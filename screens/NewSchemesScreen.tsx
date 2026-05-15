@@ -7,18 +7,25 @@ import {
   ScrollView,
   StatusBar,
   ActivityIndicator,
-  Modal,
+  Image,
+  ImageBackground,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
-import { API_ENDPOINTS } from '../config/env';
+import { API_ENDPOINTS, ENV } from '../config/env';
+import { Colors } from '../config/colors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RazorpayCheckout from 'react-native-razorpay';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'NewSchemes'>;
+
+type ThemeColor =
+  | { type: 'solid'; value: string }
+  | { type: 'gradient'; gradient: { l1: string; l2: string } };
 
 interface SchemeDetail {
   id: number;
@@ -34,12 +41,13 @@ interface SchemeDetail {
   groupName: string;
   warehouseName: string;
   schemeDate: string;
+  themeColor: ThemeColor | null;
+  bannerImage: string | null;
+  schemeImage: string | null;
 }
 
 export default function NewSchemesScreen({ navigation }: Props) {
     const [schemes, setSchemes] = useState<SchemeDetail[]>([]);
-    const [selectedScheme, setSelectedScheme] = useState<SchemeDetail | null>(null);
-    const [modalVisible, setModalVisible] = useState(false);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
   const [customerId, setCustomerId] = useState<string>('');
@@ -99,7 +107,7 @@ export default function NewSchemesScreen({ navigation }: Props) {
       });
       
       const data = await response.json();
-      console.log('Fetched schemes data:', data);
+      //console.log('Fetched schemes data:', JSON.stringify(data.data[0].scheme_terms));
       
       if (data && data.success && data.data?.length > 0) {
         // Map API data to our scheme format
@@ -117,6 +125,9 @@ export default function NewSchemesScreen({ navigation }: Props) {
           groupName: item.group_name,
           warehouseName: item.warehouse_name,
           schemeDate: new Date(item.scheme_date).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' }),
+          themeColor: item.banner?.theme_color ?? null,
+          bannerImage: item.banner?.images ?? null,
+          schemeImage: item.banner?.scheme_image ?? null,
         }));
         
         setSchemes(mappedSchemes);
@@ -167,7 +178,6 @@ export default function NewSchemesScreen({ navigation }: Props) {
 
       if (responseData?.success) {
         alert(responseData?.message || 'Joined scheme successfully.');
-        setModalVisible(false);
         getUserDetails();
       } else {
         alert(responseData?.message || 'Payment verification failed.');
@@ -247,37 +257,37 @@ export default function NewSchemesScreen({ navigation }: Props) {
       }
       console.log('Razorpay prefill details:', { userEmail, userContact, userName,orderId });
 
-      // const options = {
-      //   description: 'Join scheme payment',
-      //   image: 'https://jewel.rkcreators.com/uploads/site/300x3001.png',
-      //   currency: 'INR',
-      //   key: 'rzp_test_SFHGcfzQqiClGg',
-      //   amount: amount,
-      //   name: 'Nezlan Jewel',
-      //   order_id: orderId,
-      //   prefill: {
-      //     email: userEmail,
-      //     contact: userContact,
-      //     name: userName,
-      //   },
-      //   theme: { color: '#2BC0AC' },
-      // };
-
-       var options = {
-        description: "Payment for New Scheme - " + scheme.name,
-        image: "https://djjewellery.nezlan.in/uploads/store/DJJewellery_logo.png",
-        currency: "INR",
-        key: "rzp_live_SgUshqrEdNXF0M", //"rzp_live_ScA1021QMJkQ8C", // Your Razorpay Key Id
-        amount: String(amount), // Amount in paise
-        name: "Dhiya Jewels",
-        order_id: orderId, //Replace this with an order_id created using Orders API.
+      const options = {
+        description: 'Join scheme payment',
+        image: ENV.RAZORPAY_IMAGE,
+        currency: 'INR',
+        key: ENV.RAZORPAY_KEY_ID,
+        amount: String(amount),
+        name: ENV.RAZORPAY_BUSINESS_NAME,
+        order_id: orderId,
         prefill: {
           email: userEmail,
           contact: userContact,
           name: userName,
         },
-        theme: { color: "#2BC0AC" },
+        theme: { color: 'Colors.primary' },
       };
+
+      //  var options = {
+      //   description: "Payment for New Scheme - " + scheme.name,
+      //   image: "https://djjewellery.nezlan.in/uploads/store/DJJewellery_logo.png",
+      //   currency: "INR",
+      //   key: "rzp_live_SgUshqrEdNXF0M", //"rzp_live_ScA1021QMJkQ8C", // Your Razorpay Key Id
+      //   amount: String(amount), // Amount in paise
+      //   name: "Dhiya Jewels",
+      //   order_id: orderId, //Replace this with an order_id created using Orders API.
+      //   prefill: {
+      //     email: userEmail,
+      //     contact: userContact,
+      //     name: userName,
+      //   },
+      //   theme: { color: "Colors.primary" },
+      // };
 
       RazorpayCheckout.open(options)
         .then((paymentData) => {
@@ -296,70 +306,122 @@ export default function NewSchemesScreen({ navigation }: Props) {
   };
 
 
-  const renderSchemeCard = (scheme: typeof schemes[0]) => (
-    <View key={scheme.id} style={styles.schemeCard}>
-      <View style={[styles.schemeHeader, { backgroundColor: scheme.color + '20' }]}>
-        <View style={styles.schemeHeaderContent}>
-          <Text style={styles.schemeName}>{scheme.name}</Text>
-          <View style={styles.durationBadge}>
-            <Ionicons name="time-outline" size={14} color="#666" />
-            <Text style={styles.durationText}>{scheme.duration}</Text>
-          </View>
-        </View>
-        <View style={[styles.iconContainer, { backgroundColor: scheme.color }]}>
-          <Ionicons name="star" size={24} color="#fff" />
-        </View>
-      </View>
+  const renderCardBanner = (scheme: typeof schemes[0], children: React.ReactNode) => {
+    const tc = scheme.themeColor;
+    if (tc?.type === 'gradient') {
+      return (
+        <LinearGradient
+          colors={[tc.gradient.l1, tc.gradient.l2] as const}
+          start={{ x: 0, y: 0.5 }}
+          end={{ x: 1, y: 0.5 }}
+          style={styles.cardGradient}
+        >
+          {children}
+        </LinearGradient>
+      );
+    }
+    const bg = tc?.type === 'solid' ? tc.value : '#B83020';
+    return <View style={[styles.cardGradient, { backgroundColor: bg }]}>{children}</View>;
+  };
 
-      <View style={styles.schemeBody}>
-        <Text style={styles.schemeDescription}>{scheme.description}</Text>
-
-        <View style={styles.detailsContainer}>
-          <View style={styles.detailRow}>
-            <View style={styles.detailItem}>
-              <Text style={styles.detailLabel}>Monthly Amount</Text>
-              <Text style={styles.detailValue}>{scheme.monthlyAmount}</Text>
-            </View>
-            <View style={styles.detailDivider} />
-            <View style={styles.detailItem}>
-              <Text style={styles.detailLabel}>Benefits</Text>
-              <Text style={styles.detailValue}>{scheme.benefits}</Text>
-            </View>
-          </View>
-        </View>
-
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity 
-            style={styles.detailsButton}
-            onPress={() => {
-              setSelectedScheme(scheme);
-              setModalVisible(true);
-            }}
-          >
-            <Text style={styles.detailsButtonText}>View Details</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.joinButton, joinLoadingSchemeId === scheme.id && styles.joinButtonDisabled]}
-            onPress={() => handleJoinSchemePayment(scheme)}
-            disabled={joinLoadingSchemeId === scheme.id}
-          >
-            {joinLoadingSchemeId === scheme.id ? (
-              <ActivityIndicator size="small" color="#fff" />
+  const renderSchemeCard = (scheme: typeof schemes[0], index: number) => (
+    <View key={`${scheme.id}-${index}`} style={styles.schemeCard}>
+      {renderCardBanner(scheme,
+        <>
+          {/* Logo badge */}
+          <View style={styles.logoBadge}>
+            {scheme.schemeImage ? (
+              <Image
+                source={{ uri: scheme.schemeImage }}
+                style={styles.logoBadgeImage}
+                resizeMode="contain"
+              />
             ) : (
               <>
-                <Text style={styles.joinButtonText}>Join Now</Text>
-                <Ionicons name="arrow-forward" size={18} color="#fff" />
+                <Ionicons name="diamond" size={10} color="#fff" />
+                <Text style={styles.logoBadgeText}>{scheme.groupName || 'DIGI GOLD'}</Text>
               </>
             )}
-          </TouchableOpacity>
-        </View>
+          </View>
+
+          <View style={styles.cardMainContent}>
+            <View style={styles.cardTextSection}>
+              <Text style={styles.cardTitle}>{scheme.name}</Text>
+              <Text style={styles.cardSubtitle}>
+                {`Easy | Flexible | Convenient.\nStart with just ${scheme.monthlyAmount} | ${scheme.benefits}`}
+              </Text>
+            </View>
+
+            {/* Banner image */}
+            {scheme.bannerImage ? (
+              <Image
+                source={{ uri: scheme.bannerImage }}
+                style={styles.bannerImage}
+                resizeMode="contain"
+              />
+            ) : (
+              <View />
+              // <View style={styles.goldCoinBadge}>
+              //   <Text style={styles.goldCoinKarat}>22K</Text>
+              //   <Text style={styles.goldCoinText}>GOLD</Text>
+              // </View>
+            )}
+          </View>
+        </>
+      )}
+
+      {/* Bottom buttons */}
+      <View style={styles.cardButtons}>
+        {/* <TouchableOpacity
+          style={styles.knowMoreButton}
+          onPress={() => navigation.navigate('SchemeDetails', {
+            id: scheme.id,
+            name: scheme.name,
+            duration: scheme.duration,
+            monthlyAmount: scheme.monthlyAmount,
+            benefits: scheme.benefits,
+            description: scheme.description,
+            color: scheme.color,
+            groupName: scheme.groupName,
+            bannerImage: scheme.bannerImage,
+            schemeImage: scheme.schemeImage,
+            customerId,
+          })}
+        >
+          <Text style={styles.knowMoreText}>Know More</Text>
+        </TouchableOpacity> */}
+        <View style={styles.buttonsDivider} />
+        <TouchableOpacity
+          style={[styles.joinNowButton, joinLoadingSchemeId === scheme.id && styles.joinButtonDisabled]}
+         // onPress={() => handleJoinSchemePayment(scheme)}
+           onPress={() => navigation.navigate('SchemeDetails', {
+            id: scheme.id,
+            name: scheme.name,
+            duration: scheme.duration,
+            monthlyAmount: scheme.monthlyAmount,
+            benefits: scheme.benefits,
+            description: scheme.description,
+            color: scheme.color,
+            groupName: scheme.groupName,
+            bannerImage: scheme.bannerImage,
+            schemeImage: scheme.schemeImage,
+            customerId,
+          })}
+          disabled={joinLoadingSchemeId === scheme.id}
+        >
+          {joinLoadingSchemeId === scheme.id ? (
+            <ActivityIndicator size="small" color="#C05020" />
+          ) : (
+            <Text style={styles.joinNowText}>Join Now</Text>
+          )}
+        </TouchableOpacity>
       </View>
     </View>
   );
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <StatusBar barStyle="light-content" backgroundColor="#2BC0AC" />
+      <StatusBar barStyle="light-content" backgroundColor={Colors.primary} />
 
       {/* Header */}
       <View style={styles.header}>
@@ -373,18 +435,20 @@ export default function NewSchemesScreen({ navigation }: Props) {
         <View style={styles.headerRight} />
       </View>
 
+      <ImageBackground source={require("../assets/bg.jpeg")} style={styles.backgroundImage} resizeMode="cover" >
+        {/* <View style={styles.whiteOverlay} /> */}
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         <View style={styles.introSection}>
           <Text style={styles.introTitle}>Join Our Savings Schemes</Text>
-          <Text style={styles.introText}>
+          {/* <Text style={styles.introText}>
             Choose from our flexible savings plans designed to help you achieve
             your jewellery dreams with attractive benefits and rewards.
-          </Text>
+          </Text> */}
         </View>
 
         {loading ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#2BC0AC" />
+            <ActivityIndicator size="large" color={Colors.primary} />
             <Text style={styles.loadingText}>Loading schemes...</Text>
           </View>
         ) : error ? (
@@ -402,121 +466,14 @@ export default function NewSchemesScreen({ navigation }: Props) {
           </View>
         ) : (
           <View style={styles.schemesContainer}>
-            {schemes.map(scheme => renderSchemeCard(scheme))}
+            {schemes.map((scheme, index) => renderSchemeCard(scheme, index))}
           </View>
         )}
 
         <View style={styles.bottomSpacer} />
       </ScrollView>
+      </ImageBackground>
 
-      {/* Details Modal */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Scheme Details</Text>
-              <TouchableOpacity
-                style={styles.closeButton}
-                onPress={() => setModalVisible(false)}
-              >
-                <Ionicons name="close" size={28} color="#333" />
-              </TouchableOpacity>
-            </View>
-
-            <ScrollView style={styles.modalBody} showsVerticalScrollIndicator={false}>
-              {selectedScheme && (
-                <>
-                  <View style={[styles.modalSchemeHeader, { backgroundColor: selectedScheme.color + '20' }]}>
-                    <View style={[styles.modalIconContainer, { backgroundColor: selectedScheme.color }]}>
-                      <Ionicons name="star" size={32} color="#fff" />
-                    </View>
-                    <Text style={styles.modalSchemeName}>{selectedScheme.name}</Text>
-                    <Text style={styles.modalSchemeGroup}>{selectedScheme.groupName}</Text>
-                  </View>
-
-                  <View style={styles.modalDetailsSection}>
-                    <View style={styles.modalDetailRow}>
-                      <View style={styles.modalDetailItem}>
-                        <Ionicons name="time-outline" size={20} color="#2BC0AC" />
-                        <Text style={styles.modalDetailLabel}>Duration</Text>
-                        <Text style={styles.modalDetailValue}>{selectedScheme.duration}</Text>
-                      </View>
-                      <View style={styles.modalDetailItem}>
-                        <Ionicons name="cash-outline" size={20} color="#2BC0AC" />
-                        <Text style={styles.modalDetailLabel}>Monthly Installment</Text>
-                        <Text style={styles.modalDetailValue}>{selectedScheme.monthlyAmount}</Text>
-                      </View>
-                    </View>
-
-                    <View style={styles.modalDetailRow}>
-                      <View style={styles.modalDetailItem}>
-                        <Ionicons name="gift-outline" size={20} color="#2BC0AC" />
-                        <Text style={styles.modalDetailLabel}>Bonus Type</Text>
-                        <Text style={styles.modalDetailValue}>{selectedScheme.benefits}</Text>
-                      </View>
-                      {/* <View style={styles.modalDetailItem}>
-                        <Ionicons name="trending-up-outline" size={20} color="#2BC0AC" />
-                        <Text style={styles.modalDetailLabel}>Gold Rate</Text>
-                        <Text style={styles.modalDetailValue}>₹{selectedScheme.goldRate}</Text>
-                      </View> */}
-                    </View>
-
-                    {/* <View style={styles.modalDetailFullWidth}>
-                      <Ionicons name="wallet-outline" size={20} color="#2BC0AC" />
-                      <Text style={styles.modalDetailLabel}>Scheme Amount Options</Text>
-                      <Text style={styles.modalDetailValue}>₹{selectedScheme.schemeAmount}</Text>
-                    </View> */}
-
-                    {/* <View style={styles.modalDetailFullWidth}>
-                      <Ionicons name="location-outline" size={20} color="#2BC0AC" />
-                      <Text style={styles.modalDetailLabel}>Branch</Text>
-                      <Text style={styles.modalDetailValue}>{selectedScheme.warehouseName}</Text>
-                    </View> */}
-
-                    {/* <View style={styles.modalDetailFullWidth}>
-                      <Ionicons name="calendar-outline" size={20} color="#2BC0AC" />
-                      <Text style={styles.modalDetailLabel}>Scheme Date</Text>
-                      <Text style={styles.modalDetailValue}>{selectedScheme.schemeDate}</Text>
-                    </View> */}
-
-
-                    {selectedScheme.description && (
-                      <View style={styles.modalDetailFullWidth}>
-                        <Ionicons name="information-circle-outline" size={20} color="#2BC0AC" />
-                        <Text style={styles.modalDetailLabel}>Description</Text>
-                        <Text style={styles.modalDetailDescription}>{selectedScheme.description}</Text>
-                      </View>
-                    )}
-                  </View>
-
-                  <TouchableOpacity
-                    style={[
-                      styles.modalJoinButton,
-                      joinLoadingSchemeId === selectedScheme.id && styles.joinButtonDisabled,
-                    ]}
-                    onPress={() => handleJoinSchemePayment(selectedScheme)}
-                    disabled={joinLoadingSchemeId === selectedScheme.id}
-                  >
-                    {joinLoadingSchemeId === selectedScheme.id ? (
-                      <ActivityIndicator size="small" color="#fff" />
-                    ) : (
-                      <>
-                        <Text style={styles.modalJoinButtonText}>Join This Scheme</Text>
-                        <Ionicons name="arrow-forward" size={20} color="#fff" />
-                      </>
-                    )}
-                  </TouchableOpacity>
-                </>
-              )}
-            </ScrollView>
-          </View>
-        </View>
-      </Modal>
     </SafeAreaView>
   );
 }
@@ -524,7 +481,7 @@ export default function NewSchemesScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#2BC0AC',
+    backgroundColor: Colors.primary,
   },
   header: {
     flexDirection: 'row',
@@ -532,7 +489,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 15,
-    backgroundColor: '#2BC0AC',
+    backgroundColor: Colors.primary,
   },
   backButton: {
     width: 40,
@@ -548,20 +505,27 @@ const styles = StyleSheet.create({
   headerRight: {
     width: 40,
   },
+  backgroundImage: {
+    flex: 1,
+  },
+  whiteOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(255, 255, 255, 0.4)',
+  },
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: 'transparent',
   },
   introSection: {
-    backgroundColor: '#fff',
-    padding: 20,
-    marginBottom: 15,
+   // backgroundColor: '#fff',
+    padding: 10,
+    //marginBottom: 10,
   },
   introTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#333',
-    marginBottom: 8,
+    color: "#000000"
+    //marginBottom: 8,
   },
   introText: {
     fontSize: 14,
@@ -570,7 +534,7 @@ const styles = StyleSheet.create({
   },
   schemesContainer: {
     paddingHorizontal: 15,
-    gap: 15,
+    gap: 8,
   },
   schemeCard: {
     backgroundColor: '#fff',
@@ -579,113 +543,115 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.15,
     shadowRadius: 8,
     elevation: 4,
   },
-  schemeHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+  cardGradient: {
     padding: 16,
+    paddingBottom: 20,
   },
-  schemeHeaderContent: {
-    flex: 1,
-  },
-  schemeName: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#333',
-    marginBottom: 6,
-  },
-  durationBadge: {
+  logoBadge: {
     flexDirection: 'row',
     alignItems: 'center',
+    // backgroundColor: 'rgba(0,0,0,0.25)',
+    alignSelf: 'flex-start',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+    marginBottom: 12,
     gap: 4,
   },
-  durationText: {
-    fontSize: 13,
-    color: '#666',
-    fontWeight: '500',
+  logoBadgeImage: {
+    width: 60,
+    height: 20,
   },
-  iconContainer: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+  logoBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#fff',
+    letterSpacing: 0.5,
+  },
+  cardMainContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  cardTextSection: {
+    flex: 1,
+    paddingRight: 12,
+  },
+  cardTitle: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#fff',
+    marginBottom: 8,
+    letterSpacing: 0.3,
+  },
+  cardSubtitle: {
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.9)',
+    lineHeight: 18,
+  },
+  bannerImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 8,
+  },
+  goldCoinBadge: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: '#D4A017',
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 3,
+    borderColor: '#F0C040',
+    shadowColor: '#D4A017',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 6,
+    elevation: 6,
   },
-  schemeBody: {
-    padding: 16,
-    paddingTop: 0,
+  goldCoinKarat: {
+    fontSize: 18,
+    fontWeight: '900',
+    color: '#7B4000',
+    letterSpacing: 1,
   },
-  schemeDescription: {
-    fontSize: 14,
-    color: '#666',
-    lineHeight: 20,
-    marginBottom: 16,
-  },
-  detailsContainer: {
-    backgroundColor: '#F8F8F8',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-  },
-  detailRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  detailItem: {
-    flex: 1,
-  },
-  detailLabel: {
-    fontSize: 12,
-    color: '#999',
-    marginBottom: 4,
-  },
-  detailValue: {
-    fontSize: 16,
+  goldCoinText: {
+    fontSize: 10,
     fontWeight: '700',
-    color: '#2BC0AC',
+    color: '#7B4000',
+    letterSpacing: 2,
   },
-  detailDivider: {
-    width: 1,
-    height: 40,
-    backgroundColor: '#E0E0E0',
-    marginHorizontal: 16,
-  },
-  buttonContainer: {
+  cardButtons: {
     flexDirection: 'row',
-    gap: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#E0E0E0',
   },
-  detailsButton: {
+  knowMoreButton: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
-    borderRadius: 10,
     paddingVertical: 14,
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
   },
-  detailsButtonText: {
+  knowMoreText: {
     fontSize: 14,
     fontWeight: '600',
     color: '#333',
   },
-  joinButton: {
-    flex: 1,
-    backgroundColor: '#2BC0AC',
-    borderRadius: 10,
-    paddingVertical: 14,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
+  buttonsDivider: {
+    width: 1,
+    backgroundColor: '#E0E0E0',
   },
-  joinButtonText: {
+  joinNowButton: {
+    flex: 1,
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+  joinNowText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#fff',
+    color: '#C05020',
   },
   joinButtonDisabled: {
     opacity: 0.7,
@@ -719,7 +685,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   retryButton: {
-    backgroundColor: '#2BC0AC',
+    backgroundColor: 'Colors.primary',
     paddingHorizontal: 30,
     paddingVertical: 12,
     borderRadius: 8,
@@ -839,7 +805,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   modalJoinButton: {
-    backgroundColor: '#2BC0AC',
+    backgroundColor: 'Colors.primary',
     borderRadius: 12,
     paddingVertical: 16,
     flexDirection: 'row',

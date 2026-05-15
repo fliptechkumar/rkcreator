@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   StatusBar,
+  ImageBackground,
   useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -13,6 +14,7 @@ import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { API_ENDPOINTS } from '../config/env';
+import { Colors } from '../config/colors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RenderHtml from 'react-native-render-html';
 
@@ -68,7 +70,7 @@ export default function AboutUsScreen({ navigation }: Props) {
     }
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <StatusBar barStyle="light-content" backgroundColor="#2BC0AC" />
+      <StatusBar barStyle="light-content" backgroundColor={Colors.primary} />
 
       {/* Header */}
       <View style={styles.header}>
@@ -82,11 +84,12 @@ export default function AboutUsScreen({ navigation }: Props) {
         <View style={styles.headerRight} />
       </View>
 
-      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      <ImageBackground source={require('../assets/bg.jpeg')} style={styles.backgroundImage} resizeMode="cover" >
+        <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         {/* Company Logo/Banner */}
         {/* <View style={styles.bannerSection}>
           <View style={styles.logoContainer}>
-            <Ionicons name="diamond" size={60} color="#2BC0AC" />
+            <Ionicons name="diamond" size={60} color={Colors.primary} />
           </View>
           <Text style={styles.companyName}>Nezlan Jewellery</Text>
           <Text style={styles.tagline}>Crafting Excellence Since 1990</Text>
@@ -94,7 +97,7 @@ export default function AboutUsScreen({ navigation }: Props) {
 
          <View style={styles.section}>
           {/* <View style={styles.sectionIconHeader}>
-            <Ionicons name="book-outline" size={24} color="#2BC0AC" />
+            <Ionicons name="book-outline" size={24} color={Colors.primary} />
             <Text style={styles.sectionTitle}>{aboutUsContent?.title}</Text>
           </View> */}
           <RenderHtml
@@ -136,7 +139,7 @@ export default function AboutUsScreen({ navigation }: Props) {
         {/* Our Story */}
         {/* <View style={styles.section}>
           <View style={styles.sectionIconHeader}>
-            <Ionicons name="book-outline" size={24} color="#2BC0AC" />
+            <Ionicons name="book-outline" size={24} color={Colors.primary} />
             <Text style={styles.sectionTitle}>Our Story</Text>
           </View>
           <Text style={styles.sectionText}>
@@ -155,7 +158,7 @@ export default function AboutUsScreen({ navigation }: Props) {
         {/* Our Mission */}
         {/* <View style={styles.section}>
           <View style={styles.sectionIconHeader}>
-            <Ionicons name="flag-outline" size={24} color="#2BC0AC" />
+            <Ionicons name="flag-outline" size={24} color={Colors.primary} />
             <Text style={styles.sectionTitle}>Our Mission</Text>
           </View>
           <Text style={styles.sectionText}>
@@ -169,7 +172,7 @@ export default function AboutUsScreen({ navigation }: Props) {
         {/* Our Values */}
         {/* <View style={styles.section}>
           <View style={styles.sectionIconHeader}>
-            <Ionicons name="heart-outline" size={24} color="#2BC0AC" />
+            <Ionicons name="heart-outline" size={24} color={Colors.primary} />
             <Text style={styles.sectionTitle}>Our Values</Text>
           </View>
           <View style={styles.valuesList}>
@@ -181,7 +184,7 @@ export default function AboutUsScreen({ navigation }: Props) {
               { icon: 'checkmark-circle', text: 'Ethical Practices' },
             ].map((value, index) => (
               <View key={index} style={styles.valueItem}>
-                <Ionicons name={value.icon as any} size={20} color="#2BC0AC" />
+                <Ionicons name={value.icon as any} size={20} color={Colors.primary} />
                 <Text style={styles.valueText}>{value.text}</Text>
               </View>
             ))}
@@ -191,7 +194,7 @@ export default function AboutUsScreen({ navigation }: Props) {
         {/* Contact Information */}
         {/* <View style={styles.section}>
           <View style={styles.sectionIconHeader}>
-            <Ionicons name="location-outline" size={24} color="#2BC0AC" />
+            <Ionicons name="location-outline" size={24} color={Colors.primary} />
             <Text style={styles.sectionTitle}>Visit Us</Text>
           </View>
           <View style={styles.contactCard}>
@@ -235,7 +238,8 @@ export default function AboutUsScreen({ navigation }: Props) {
         </View> */}
 
         <View style={styles.bottomSpacer} />
-      </ScrollView>
+        </ScrollView>
+      </ImageBackground>
     </SafeAreaView>
   );
 }
@@ -243,7 +247,7 @@ export default function AboutUsScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#2BC0AC',
+    backgroundColor: Colors.primary,
   },
   header: {
     flexDirection: 'row',
@@ -251,7 +255,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 15,
-    backgroundColor: '#2BC0AC',
+    backgroundColor: Colors.primary,
   },
   backButton: {
     width: 40,
@@ -267,9 +271,10 @@ const styles = StyleSheet.create({
   headerRight: {
     width: 40,
   },
+  backgroundImage: { flex: 1 },
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: 'transparent',
   },
   bannerSection: {
     backgroundColor: '#fff',
@@ -298,7 +303,7 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
   section: {
-    backgroundColor: '#fff',
+   // backgroundColor: '#fff',
     padding: 20,
     marginBottom: 15,
   },
@@ -335,7 +340,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   contactCard: {
-    backgroundColor: '#F8F8F8',
+    //backgroundColor: '#F8F8F8',
     borderRadius: 12,
     padding: 16,
     gap: 16,

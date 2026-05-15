@@ -1,8 +1,10 @@
 // Environment Configuration
 export const ENV = {
-  API_BASE_URL: 'https://djjewellery.nezlan.in/nezlan_api', //'https://mrschains.nezlan.in/nezlan_api' , //'https://jewel.rkcreators.com/nezlan_api', // 'https://mrschains.nezlan.in/nezlan_api',
-  PAYMENT_URL: 'https://djjewellery.nezlan.in/', //'https://mrschains.nezlan.in/',       //'https://jewel.rkcreators.com/',
-  RAZORPAY_KEY_ID: '',
+  API_BASE_URL: 'https://jewel.rkcreators.com/nezlan_api', //'https://djjewellery.nezlan.in/nezlan_api', //'https://mrschains.nezlan.in/nezlan_api' , //'https://jewel.rkcreators.com/nezlan_api', // 'https://mrschains.nezlan.in/nezlan_api',
+  PAYMENT_URL: 'https://jewel.rkcreators.com/' , //'https://djjewellery.nezlan.in/', //'https://mrschains.nezlan.in/',       //'https://jewel.rkcreators.com/',
+  RAZORPAY_KEY_ID: 'rzp_test_SFHGcfzQqiClGg',  //"rzp_live_SgUshqrEdNXF0M", // "rzp_live_ScA1021QMJkQ8C"
+  RAZORPAY_IMAGE: 'https://jewel.rkcreators.com/uploads/site/300x3001.png',
+  RAZORPAY_BUSINESS_NAME: 'Nezlan Jewel',
 };
 
 // API Endpoints
@@ -24,6 +26,7 @@ export const API_ENDPOINTS = {
   PAY_DUE_DETAILS: `${ENV.API_BASE_URL}/Customer_api/paydue_details`,
   PAY_DUE_SHOWMORE: `${ENV.API_BASE_URL}/Customer_api/paydue_lists`,
   NEWSCHEMES: `${ENV.API_BASE_URL}/Customer_api/newSchemes`,
+  SCHEME_TERMS: `${ENV.API_BASE_URL}/Scheme_api/schemeTerms`,
   CREATE_ORDER: `${ENV.API_BASE_URL}/Customer_api/create_order`,
   VERIFY_PAYMENT: `${ENV.PAYMENT_URL}/Payment_verify/RazorePayVerify`,
   REGISTER_CUSTOMER: `${ENV.API_BASE_URL}/Register_api/addCustomer`,
